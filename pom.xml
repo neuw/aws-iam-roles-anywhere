@@ -8,10 +8,19 @@
   <packaging>pom</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
+  <description>AWS IAM roles anywhere credential provider library for Java</description>
+  <url>https://github.com/neuw/aws-iam-roles-anywhere</url>
   <modules>
     <module>core</module>
     <module>starter</module>
   </modules>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>https://github.com/neuw/aws-iam-roles-anywhere/blob/main/LICENSE</url>
+    </license>
+  </licenses>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

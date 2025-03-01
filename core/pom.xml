@@ -11,7 +11,8 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <url>http://maven.apache.org</url>
+    <description>AWS IAM roles anywhere credential provider library for Java</description>
+    <url>https://github.com/neuw/aws-iam-roles-anywhere</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

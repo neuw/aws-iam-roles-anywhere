@@ -10,7 +10,8 @@
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>starter</description>
+    <description>AWS IAM roles anywhere credential provider spring boot starter library</description>
+    <url>https://github.com/neuw/aws-iam-roles-anywhere</url>
     <properties>
         <java.version>17</java.version>
     </properties>
