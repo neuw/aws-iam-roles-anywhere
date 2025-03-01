@@ -22,6 +22,21 @@
     </license>
   </licenses>
 
+  <scm>
+    <connection>scm:git:git://github.com/neuw/aws-iam-roles-anywhere.git</connection>
+    <developerConnection>scm:git:ssh://github.com:neuw/aws-iam-roles-anywhere.git</developerConnection>
+    <url>http://github.com/neuw/aws-iam-roles-anywhere/tree/master</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Karanbir Singh</name>
+      <email>krnbr@live.in</email>
+      <organization>Neuw</organization>
+      <organizationUrl>https://www.linkedin.com/in/krnbr/</organizationUrl>
+    </developer>
+  </developers>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <aws-sdk.version>2.30.22</aws-sdk.version>
