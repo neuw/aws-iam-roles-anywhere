@@ -39,8 +39,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <aws-sdk.version>2.30.22</aws-sdk.version>
-    <spring-boot.version>3.4.2</spring-boot.version>
+    <aws-sdk.version>2.30.30</aws-sdk.version>
+    <spring-boot.version>3.4.3</spring-boot.version>
     <java.version>17</java.version>
     <parent.version>${project.version}</parent.version>
     <jackson-bom.version>2.18.2</jackson-bom.version>
@@ -98,6 +98,25 @@
           </annotationProcessorPaths>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.7</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
