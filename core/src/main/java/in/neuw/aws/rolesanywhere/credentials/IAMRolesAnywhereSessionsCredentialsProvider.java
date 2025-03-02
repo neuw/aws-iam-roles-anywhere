@@ -202,42 +202,11 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         }
 
         private void initRestClientBasedOnRegion() {
-            //template.setInterceptors(interceptors);
             this.sdkHttpClient(
                     ApacheHttpClient.builder()
                             .maxConnections(100).build()
             );
         }
-
-        /*private ArrayList<ClientHttpRequestInterceptor> getClientHttpRequestInterceptors() {
-            var interceptors = new ArrayList<ClientHttpRequestInterceptor>(1);
-            interceptors.add((request, body, execution) -> {
-                log.debug("curl for the roles anywhere for debug purpose only \n{}", toCurl(request, body));
-                var res = execution.execute(request, body);
-                return res;
-            });
-            return interceptors;
-        }
-
-        private String toCurl(HttpRequest request, byte[] body) {
-            StringBuilder curl = new StringBuilder("curl -X ");
-            curl.append(request.getMethod()).append(" '");
-            curl.append(request.getURI()).append("' ");
-
-            // Add headers
-            request.getHeaders().forEach((key, values) -> {
-                values.forEach(value -> {
-                    curl.append("-H '").append(key).append(": ").append(value).append("' ");
-                });
-            });
-
-            // Add body if present
-            if (body != null && body.length > 0) {
-                curl.append("-d '").append(new String(body)).append("' ");
-            }
-
-            return curl.toString();
-        }*/
 
         @Override
         public IAMRolesAnywhereSessionsCredentialsProvider build() {
