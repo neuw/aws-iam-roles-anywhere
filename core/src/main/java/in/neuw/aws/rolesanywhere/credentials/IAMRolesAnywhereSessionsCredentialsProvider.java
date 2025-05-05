@@ -31,9 +31,9 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         extends RolesAnywhereCredentialsProvider
         implements ToCopyableBuilder<IAMRolesAnywhereSessionsCredentialsProvider.Builder, IAMRolesAnywhereSessionsCredentialsProvider> {
 
-    private ObjectMapper objectMapper;
-    private AwsRolesAnywhereSessionsRequest awsRolesAnywhereSessionsRequest;
-    private AwsRolesAnyWhereRequesterDetails requesterDetails;
+    private final ObjectMapper objectMapper;
+    private final AwsRolesAnywhereSessionsRequest awsRolesAnywhereSessionsRequest;
+    private final AwsRolesAnyWhereRequesterDetails requesterDetails;
 
     @SneakyThrows
     private IAMRolesAnywhereSessionsCredentialsProvider(Builder builder) {

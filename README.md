@@ -16,3 +16,13 @@ Structure of the library is quite straight forward:-
 ➬ A core library - based on AWS SDK, and uses APACHE http client for http call.
 
 ➬ A Spring Boot starter library that provides AutoConfiguration and uses core library underneath.
+
+The initial BETA version has been made available over maven here:-
+
+```
+<dependency>
+    <groupId>in.neuw</groupId>
+    <artifactId>aws-iam-roles-anywhere-core</artifactId>
+    <version>0.3</version>
+</dependency>
+```

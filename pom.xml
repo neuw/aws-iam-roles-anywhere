@@ -4,7 +4,7 @@
 
   <groupId>in.neuw</groupId>
   <artifactId>aws-iam-roles-anywhere</artifactId>
-  <version>0.3</version>
+  <version>0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -162,11 +162,12 @@
         <version>0.4.0</version>
         <extensions>true</extensions>
         <configuration>
-          <autoPublish>false</autoPublish>
-          <deploymentName>deploy-8th-march-2025-3</deploymentName>
+          <autoPublish>true</autoPublish>
+          <deploymentName>deploy-27th-march-2025-2</deploymentName>
           <publishingServerId>central</publishingServerId>
           <tokenAuth>true</tokenAuth>
           <skipPublishing>false</skipPublishing>
+          <waitUntil>validated</waitUntil>
         </configuration>
       </plugin>
     </plugins>

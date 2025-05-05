@@ -8,6 +8,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import software.amazon.awssdk.utils.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,32 +37,33 @@ public class CertAndKeyParserAndLoader {
     public static final String SHA256_RSA = "SHA256withRSA";
     public static final String SHA256_EC_DSA = "SHA256withECDSA";
 
-    public static final X509Certificate extractCertificate(final String base64EncodedCert){
+    public static X509Certificate extractCertificate(final String base64EncodedCert){
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             byte[] decodedCertificate = Base64.getDecoder().decode(base64EncodedCert);
             X509Certificate cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(decodedCertificate));
+            log.info("Certificate expires at {}", cert.getNotAfter());
             return cert;
         } catch (CertificateException e) {
-            log.error("Error while extracting certificate", e.getMessage());
+            log.error("Error while extracting certificate, {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    public static final List<X509Certificate> extractCertificates(final String base64EncodedCert) throws CertificateException, NoSuchProviderException {
+    public static List<X509Certificate> extractCertificates(final String base64EncodedCert) throws CertificateException, NoSuchProviderException {
         Security.addProvider(new BouncyCastleProvider());
         CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
-        ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(base64EncodedCert));
+        var inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(base64EncodedCert));
 
         List<X509Certificate> certificates = new ArrayList<>();
-        for (Object cert : cf.generateCertificates(bais)) {
+        for (Object cert : cf.generateCertificates(inputStream)) {
             certificates.add((X509Certificate) cert);
         }
 
         return certificates;
     }
 
-    public static final boolean possibleChainOfCerts(final String base64EncodedCert) {
+    public static boolean possibleChainOfCerts(final String base64EncodedCert) {
         String rawCertFile = new String(Base64.getDecoder().decode(base64EncodedCert));
         if (countOccurrencesOf(rawCertFile, BEGIN_CERT) == 1) {
             log.info("only one cert provided");
@@ -75,22 +77,6 @@ public class CertAndKeyParserAndLoader {
         return false;
     }
 
-    private static int countOccurrencesOf(String str, String sub) {
-        // TODO
-        /*if (!hasLength(str) || !hasLength(sub)) {
-            return 0;
-        }*/
-
-        int count = 0;
-        int pos = 0;
-        int idx;
-        while ((idx = str.indexOf(sub, pos)) != -1) {
-            ++count;
-            pos = idx + sub.length();
-        }
-        return count;
-    }
-
     public static X509CertificateChain resolveCertificateChain(final String base64EncodedCert) throws CertificateException, NoSuchProviderException {
         X509CertificateChain x509CertificateChain = new X509CertificateChain();
         x509CertificateChain.setBase64EncodedCertificate(base64EncodedCert);
@@ -99,10 +85,13 @@ public class CertAndKeyParserAndLoader {
             for (var cert : certs) {
                 // root CA is different from intermediate CA
                 if(isRootCA(cert)) {
+                    log.info("root CA expires at, {}", cert.getNotAfter());
                     x509CertificateChain.setRootCACertificate(cert);
                 } else if (ifX509CertIsCA(cert)){ // for intermediate CA
+                    log.info("intermediate CA expires at, {}", cert.getNotAfter());
                     x509CertificateChain.setIntermediateCACertificate(cert);
                 } else {
+                    log.info("leaf cert expires at, {}", cert.getNotAfter());
                     x509CertificateChain.setLeafCertificate(cert); // leaf certificate
                 }
             }
@@ -204,6 +193,23 @@ public class CertAndKeyParserAndLoader {
             log.error("this is not Root CA, exception", e.getCause());
         }
         return false;
+    }
+
+    private static int countOccurrencesOf(final String str,
+                                          final String subString) {
+        // if main string or subString is empty, makes no sense of occurrence, hence hard stopped with 0 occurrence
+        if (StringUtils.isBlank(str) || StringUtils.isBlank(subString)) {
+            return 0;
+        }
+
+        int count = 0;
+        int pos = 0;
+        int idx;
+        while ((idx = str.indexOf(subString, pos)) != -1) {
+            ++count;
+            pos = idx + subString.length();
+        }
+        return count;
     }
 
 }
