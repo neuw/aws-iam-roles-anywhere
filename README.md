@@ -1,5 +1,9 @@
 ### AWS roles anywhere Credential Helper(100% programmatic)
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=neuw_aws-iam-roles-anywhere&metric=alert_status&token=c504fc27486350af3da99abb8f023932fe4caab3)](https://sonarcloud.io/summary/new_code?id=neuw_aws-iam-roles-anywhere)
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=neuw_aws-iam-roles-anywhere&metric=coverage&token=c504fc27486350af3da99abb8f023932fe4caab3)](https://sonarcloud.io/summary/new_code?id=neuw_aws-iam-roles-anywhere)
+
 AWS roles anywhere is a great IAM service that was launched in July 2022.
 
 AWS provides a [tool](https://github.com/aws/rolesanywhere-credential-helper) to fetch temporary credentials by providing the certificate and key.
@@ -23,6 +27,7 @@ The initial BETA version has been made available over maven here:-
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
 </dependency>
 ```
+

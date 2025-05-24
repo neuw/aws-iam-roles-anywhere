@@ -31,7 +31,6 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         extends RolesAnywhereCredentialsProvider
         implements ToCopyableBuilder<IAMRolesAnywhereSessionsCredentialsProvider.Builder, IAMRolesAnywhereSessionsCredentialsProvider> {
 
-    private final ObjectMapper objectMapper;
     private final AwsRolesAnywhereSessionsRequest awsRolesAnywhereSessionsRequest;
     private final AwsRolesAnyWhereRequesterDetails requesterDetails;
 
@@ -40,7 +39,6 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         super(builder, "iam-r-aw-thread");
 
         log.info("setting up the rest client for 'roles anywhere AWS service', with host = {} based on region = {}", builder.host, builder.region);
-        this.objectMapper = super.objectMapper;
         this.awsRolesAnywhereSessionsRequest = builder.awsRolesAnywhereSessionsRequest;
         this.requesterDetails = builder.requesterDetails;
         prefetchCredentials();

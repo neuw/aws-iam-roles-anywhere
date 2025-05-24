@@ -58,7 +58,7 @@ public class CertAndKeyParserAndLoader {
         var inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(base64EncodedCert));
 
         List<X509Certificate> certificates = new ArrayList<>();
-        for (Object cert : cf.generateCertificates(inputStream)) {
+        for (var cert : cf.generateCertificates(inputStream)) {
             certificates.add((X509Certificate) cert);
         }
 

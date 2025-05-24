@@ -29,8 +29,7 @@ import java.util.Base64;
 import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.*;
 import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil.convertToOpenSSLFormat;
 import static in.neuw.aws.rolesanywhere.utils.MockAwsRolesAnywhereSessionsResponseGenerator.mockAwsRolesAnywhereSessionsResponse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -313,6 +312,73 @@ class CoreTests {
 
         assertEquals(Duration.of(1, ChronoUnit.MINUTES), provider.staleTime());
         assertEquals(Duration.of(3, ChronoUnit.MINUTES), provider.prefetchTime());
+
+        S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
+    }
+
+    @Test
+    void testProviderCopy() throws Exception {
+        mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
+                        Mockito.any(AwsRolesAnywhereSessionsRequest.class),
+                        Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
+                        Mockito.any(SdkHttpClient.class),
+                        Mockito.any(ObjectMapper.class)
+                )
+        ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
+
+        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
+
+        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var ecCertChain = generateCertificate("EC", ecKeyPair); // actual
+
+        System.out.println("ecCertChain "+ecCertChain);
+
+        System.out.println("ecKeyBase64 "+ecKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(ecKeyBase64);
+        properties.setEncodedX509Certificate(ecCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(false);
+
+        var provider = new IAMRolesAnywhereSessionsCredentialsProvider
+                .Builder(properties, objectMapper)
+                .prefetch(properties.getPrefetch())
+                .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                .durationSeconds(3600)
+                .roleArn("test-something")
+                .profileArn("test-something")
+                .encodedPrivateKey(ecKeyBase64)
+                .encodedX509Certificate(ecCertChain)
+                .roleSessionName("something")
+                .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                .prefetch(false)
+                .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                .region("ap-south-1")
+                .trustAnchorArn("test-something")
+                .build();
+
+        var providerClone = provider.copy(p -> {
+            p.roleSessionName("something-else");
+        });
+
+        assertEquals(Duration.of(1, ChronoUnit.MINUTES), provider.staleTime());
+        assertEquals(Duration.of(3, ChronoUnit.MINUTES), provider.prefetchTime());
+
+        assertNotEquals(provider, providerClone);
+
+        var builder = provider.toBuilder();
+        builder.roleSessionName("some-other-value");
+        var newProvider = builder.build();
+
+        assertNotEquals(providerClone, newProvider);
 
         S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
     }

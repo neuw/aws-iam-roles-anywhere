@@ -84,9 +84,9 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
     @Override
     public AwsCredentials resolveCredentials() {
         AwsSessionCredentials credentials = sessionCache.get();
-        credentials.expirationTime().ifPresent(t -> {
-            log.info(() -> "Using Role Anywhere credentials with expiration time of " + t);
-        });
+        credentials
+                .expirationTime()
+                .ifPresent(t -> log.info(() -> "Using Role Anywhere credentials with expiration time of " + t));
         return credentials;
     }
 
