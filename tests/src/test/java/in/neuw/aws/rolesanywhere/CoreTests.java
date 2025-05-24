@@ -29,6 +29,7 @@ import java.util.Base64;
 import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.*;
 import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil.convertToOpenSSLFormat;
 import static in.neuw.aws.rolesanywhere.utils.MockAwsRolesAnywhereSessionsResponseGenerator.mockAwsRolesAnywhereSessionsResponse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -291,7 +292,7 @@ class CoreTests {
         properties.setPrefetch(true);
         properties.setRegion("ap-south-1");
         properties.setDurationSeconds(3600);
-        properties.setAsyncCredentialUpdateEnabled(true);
+        properties.setAsyncCredentialUpdateEnabled(false);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
                 .Builder(properties, objectMapper)
@@ -303,11 +304,15 @@ class CoreTests {
                 .encodedPrivateKey(ecKeyBase64)
                 .encodedX509Certificate(ecCertChain)
                 .roleSessionName("something")
-                .prefetchTime(Duration.of(30, ChronoUnit.MINUTES))
+                .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
                 .prefetch(false)
+                .staleTime(Duration.of(1, ChronoUnit.MINUTES))
                 .region("ap-south-1")
                 .trustAnchorArn("test-something")
                 .build();
+
+        assertEquals(Duration.of(1, ChronoUnit.MINUTES), provider.staleTime());
+        assertEquals(Duration.of(3, ChronoUnit.MINUTES), provider.prefetchTime());
 
         S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
     }
