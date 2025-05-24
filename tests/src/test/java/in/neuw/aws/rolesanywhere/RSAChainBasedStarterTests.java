@@ -39,7 +39,7 @@ import static software.amazon.awssdk.regions.Region.AP_SOUTH_1;
         "aws.iam.rolesanywhere.prefetch=true",
         "aws.iam.rolesanywhere.async-credential-update-enabled=true"
 })
-public class RSAChainBasedStarterTests {
+class RSAChainBasedStarterTests {
 
     private static MockedStatic<AwsX509SigningHelper> mockedStatic;
 
@@ -63,12 +63,12 @@ public class RSAChainBasedStarterTests {
     private AwsCredentialsProvider awsCredentialsProvider;
 
     @BeforeAll
-    public static void init() {
+    static void init() {
         MockAwsServer.init();
     }
 
     @AfterAll
-    public static void cleanup() {
+    static void cleanup() {
         MockAwsServer.stopInstance();
         if (mockedStatic != null) {
             mockedStatic.close();
@@ -97,7 +97,7 @@ public class RSAChainBasedStarterTests {
 
     @Test
     @DirtiesContext
-    public void contextLoadRSAChain() throws Exception {
+    void contextLoadRSAChain() throws Exception {
         System.out.println(awsCredentialsProvider.resolveCredentials().accountId());
     }
 

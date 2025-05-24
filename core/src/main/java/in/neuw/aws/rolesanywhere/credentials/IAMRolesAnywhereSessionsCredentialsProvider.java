@@ -43,7 +43,6 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         this.objectMapper = super.objectMapper;
         this.awsRolesAnywhereSessionsRequest = builder.awsRolesAnywhereSessionsRequest;
         this.requesterDetails = builder.requesterDetails;
-        //getUpdatedCredentials();
         prefetchCredentials();
     }
 

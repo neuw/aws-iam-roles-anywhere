@@ -28,6 +28,8 @@ import java.util.List;
 @Slf4j
 public class CertAndKeyParserAndLoader {
 
+    private CertAndKeyParserAndLoader() {}
+
     public static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
     // public static final String END_CERT = "-----END CERTIFICATE-----"; // not needed!
     public static final String EC_OID = "1.2.840.10045.2.1";

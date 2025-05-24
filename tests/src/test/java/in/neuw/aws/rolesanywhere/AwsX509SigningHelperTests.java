@@ -6,15 +6,15 @@ import software.amazon.awssdk.regions.Region;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AwsX509SigningHelperTests {
+class AwsX509SigningHelperTests {
 
     @Test
-    public void resolveHostBasedOnRegionTest() {
+    void resolveHostBasedOnRegionTest() {
         assertEquals("rolesanywhere.ap-south-1.amazonaws.com", AwsX509SigningHelper.resolveHostBasedOnRegion(Region.AP_SOUTH_1));
     }
 
     @Test
-    public void resolveHostEndpointTest() {
+    void resolveHostEndpointTest() {
         assertEquals("https://rolesanywhere.ap-south-1.amazonaws.com", AwsX509SigningHelper.resolveHostEndpoint(Region.AP_SOUTH_1));
     }
 

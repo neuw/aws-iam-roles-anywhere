@@ -40,6 +40,8 @@ import static software.amazon.awssdk.http.auth.aws.internal.signer.util.SignerCo
 @Slf4j
 public class AwsX509SigningHelper {
 
+    private AwsX509SigningHelper() {}
+
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC);
     private static final String LINE_SEPARATOR = "\n";
     private static final String SEMI_COLON = ";";
@@ -203,7 +205,7 @@ public class AwsX509SigningHelper {
                                              final String algorithm,
                                              final String signedHeaders,
                                              final X509Certificate cert,
-                                             final PrivateKey key) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
+                                             final PrivateKey key) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         var certId = cert.getSerialNumber().toString();
         var credentialPart = certId+"/"+credentialScope(instant, region);
         var signedContent = sign(contentToSign, key);

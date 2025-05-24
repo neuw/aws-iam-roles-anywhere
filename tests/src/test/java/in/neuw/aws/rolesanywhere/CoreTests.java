@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CoreTests {
+class CoreTests {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -54,13 +54,13 @@ public class CoreTests {
     }
 
     @BeforeAll
-    public static void init() {
+    static void init() {
         Security.addProvider(new BouncyCastleProvider());
         MockAwsServer.init();
     }
 
     @AfterAll
-    public static void cleanup() {
+    static void cleanup() {
         MockAwsServer.stopInstance();
         if (mockedStatic != null) {
             mockedStatic.close();
@@ -69,7 +69,7 @@ public class CoreTests {
     }
 
     @Test
-    public void testWithECKeyBasedChain() throws Exception {
+    void testWithECKeyBasedChain() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -118,7 +118,7 @@ public class CoreTests {
     }
 
     @Test
-    public void testWithRSAKeyBasedChain() throws Exception {
+    void testWithRSAKeyBasedChain() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -158,10 +158,7 @@ public class CoreTests {
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
 
-        // Call the method that internally uses the static method
-        //var result = provider.prefetchTime();
         S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
-        //System.out.println("result is "+result);
 
         mockedStatic.verify(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -172,7 +169,7 @@ public class CoreTests {
     }
 
     @Test
-    public void testWithECKeyBasedCert() throws Exception {
+    void testWithECKeyBasedCert() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -221,7 +218,7 @@ public class CoreTests {
     }
 
     @Test
-    public void testWithWrongCert() throws Exception {
+    void testWithWrongCert() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -265,7 +262,7 @@ public class CoreTests {
     }
 
     @Test
-    public void testWithBuilderProps() throws Exception {
+    void testWithBuilderProps() throws Exception {
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
@@ -316,7 +313,7 @@ public class CoreTests {
     }
 
     @Test
-    public void testWithRSAKeyBasedCert() throws Exception {
+    void testWithRSAKeyBasedCert() throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
 
@@ -356,7 +353,7 @@ public class CoreTests {
     }
 
     @Test
-    public void testWithRSAKeyBasedCertWithChain() throws Exception {
+    void testWithRSAKeyBasedCertWithChain() throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");

@@ -44,7 +44,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
 
     private final Duration staleTime;
     private final Duration prefetchTime;
-    private final Boolean asyncCredentialUpdateEnabled;
+    private final boolean asyncCredentialUpdateEnabled;
     private final boolean prefetch;
 
     RolesAnywhereCredentialsProvider(BaseBuilder<?, ?> builder, String asyncThreadName) {
@@ -139,7 +139,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
         implements CopyableBuilder<B, T> {
         private final Function<B, T> providerConstructor;
 
-        private Boolean asyncCredentialUpdateEnabled = false;
+        private boolean asyncCredentialUpdateEnabled;
         private SdkHttpClient sdkHttpClient;
         private ObjectMapper objectMapper;
         private Duration staleTime;
