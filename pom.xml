@@ -4,7 +4,7 @@
 
   <groupId>in.neuw</groupId>
   <artifactId>aws-iam-roles-anywhere</artifactId>
-  <version>0.4-SNAPSHOT</version>
+  <version>0.4</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -46,6 +46,8 @@
     <jackson-bom.version>2.18.2</jackson-bom.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+    <jacoco.version>0.8.10</jacoco.version>
   </properties>
 
   <dependencyManagement>
@@ -73,12 +75,12 @@
       </dependency>
       <dependency>
         <groupId>in.neuw</groupId>
-        <artifactId>core</artifactId>
+        <artifactId>aws-iam-roles-anywhere-core</artifactId>
         <version>${parent.version}</version>
       </dependency>
       <dependency>
         <groupId>in.neuw</groupId>
-        <artifactId>starter</artifactId>
+        <artifactId>aws-iam-roles-anywhere-starter</artifactId>
         <version>${parent.version}</version>
       </dependency>
 
@@ -86,6 +88,34 @@
   </dependencyManagement>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>3.10.0.2594</version>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <id>initialize-coverage-before-unit-test-execution</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>initialize-coverage-before-integration-test-execution</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <propertyName>integrationTestCoverageAgent</propertyName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -96,17 +126,6 @@
               <artifactId>lombok</artifactId>
             </path>
           </annotationProcessorPaths>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.central</groupId>
-        <artifactId>central-publishing-maven-plugin</artifactId>
-        <version>0.7.0</version>
-        <extensions>true</extensions>
-        <configuration>
-          <publishingServerId>central</publishingServerId>
-          <autoPublish>true</autoPublish>
-          <waitUntil>published</waitUntil>
         </configuration>
       </plugin>
       <plugin>
@@ -159,18 +178,38 @@
       <plugin>
         <groupId>org.sonatype.central</groupId>
         <artifactId>central-publishing-maven-plugin</artifactId>
-        <version>0.4.0</version>
+        <version>0.7.0</version>
         <extensions>true</extensions>
         <configuration>
           <autoPublish>true</autoPublish>
-          <deploymentName>deploy-27th-march-2025-2</deploymentName>
+          <deploymentName>deploy-24th-may-2025-${version}-1</deploymentName>
           <publishingServerId>central</publishingServerId>
-          <tokenAuth>true</tokenAuth>
           <skipPublishing>false</skipPublishing>
           <waitUntil>validated</waitUntil>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>coverage</id>
+      <modules>
+        <module>core</module>
+        <module>starter</module>
+        <module>tests</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>core</module>
+        <module>starter</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

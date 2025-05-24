@@ -29,7 +29,7 @@ import java.util.List;
 public class CertAndKeyParserAndLoader {
 
     public static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
-    public static final String END_CERT = "-----END CERTIFICATE-----";
+    // public static final String END_CERT = "-----END CERTIFICATE-----"; // not needed!
     public static final String EC_OID = "1.2.840.10045.2.1";
     public static final String RSA_OID = "1.2.840.113549.1.1.1";
     public static final String EC = "EC";
@@ -65,9 +65,9 @@ public class CertAndKeyParserAndLoader {
 
     public static boolean possibleChainOfCerts(final String base64EncodedCert) {
         String rawCertFile = new String(Base64.getDecoder().decode(base64EncodedCert));
-        if (countOccurrencesOf(rawCertFile, BEGIN_CERT) == 1) {
+        if (countOccurrencesOfBEGINCERT(rawCertFile) == 1) {
             log.info("only one cert provided");
-        } else if (countOccurrencesOf(rawCertFile, BEGIN_CERT) > 1) {
+        } else if (countOccurrencesOfBEGINCERT(rawCertFile) > 1) {
             log.info("possible chain of certificates");
             return true;
         } else {
@@ -153,7 +153,7 @@ public class CertAndKeyParserAndLoader {
         return keyType;
     }
 
-    private static PrivateKey privateKeyResolver(final byte[] key) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+    public static PrivateKey privateKeyResolver(final byte[] key) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         Security.addProvider(new BouncyCastleProvider());
 
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(key);
@@ -195,19 +195,18 @@ public class CertAndKeyParserAndLoader {
         return false;
     }
 
-    private static int countOccurrencesOf(final String str,
-                                          final String subString) {
+    private static int countOccurrencesOfBEGINCERT(final String str) {
         // if main string or subString is empty, makes no sense of occurrence, hence hard stopped with 0 occurrence
-        if (StringUtils.isBlank(str) || StringUtils.isBlank(subString)) {
+        if (StringUtils.isBlank(str) || StringUtils.isBlank(BEGIN_CERT)) {
             return 0;
         }
 
         int count = 0;
         int pos = 0;
         int idx;
-        while ((idx = str.indexOf(subString, pos)) != -1) {
+        while ((idx = str.indexOf(BEGIN_CERT, pos)) != -1) {
             ++count;
-            pos = idx + subString.length();
+            pos = idx + BEGIN_CERT.length();
         }
         return count;
     }

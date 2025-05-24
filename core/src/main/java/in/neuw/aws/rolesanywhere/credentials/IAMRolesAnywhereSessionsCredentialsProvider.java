@@ -6,6 +6,7 @@ import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsRequ
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsResponse;
 import in.neuw.aws.rolesanywhere.credentials.models.X509CertificateChain;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
+import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.annotations.NotThreadSafe;
@@ -22,7 +23,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
-import static in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper.*;
 import static in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader.extractPrivateKey;
 import static in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader.resolveCertificateChain;
 
@@ -40,7 +40,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         super(builder, "iam-r-aw-thread");
 
         log.info("setting up the rest client for 'roles anywhere AWS service', with host = {} based on region = {}", builder.host, builder.region);
-        this.objectMapper = builder.objectMapper;
+        this.objectMapper = super.objectMapper;
         this.awsRolesAnywhereSessionsRequest = builder.awsRolesAnywhereSessionsRequest;
         this.requesterDetails = builder.requesterDetails;
         //getUpdatedCredentials();
@@ -82,12 +82,12 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
                                                               final AwsRolesAnyWhereRequesterDetails requesterDetails,
                                                               final SdkHttpClient sdkHttpClient,
                                                               final ObjectMapper objectMapper) {
-        return getIamRolesAnywhereSessions(awsRolesAnywhereSessionsRequest, requesterDetails, sdkHttpClient, objectMapper);
+        return AwsX509SigningHelper.getIamRolesAnywhereSessions(awsRolesAnywhereSessionsRequest, requesterDetails, sdkHttpClient, objectMapper);
     }
 
     @Override
     public Builder toBuilder() {
-        return null;
+        return new Builder(this);
     }
 
     @Override
@@ -99,7 +99,6 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
     public static final class Builder extends BaseBuilder<Builder, IAMRolesAnywhereSessionsCredentialsProvider> {
         private AwsRolesAnywhereSessionsRequest awsRolesAnywhereSessionsRequest;
         private AwsRolesAnywhereProperties awsRolesAnywhereProperties;
-        private ObjectMapper objectMapper;
         private String roleArn;
         private String profileArn;
         private String trustAnchorArn;
@@ -115,11 +114,9 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         // a wrapper, passed on to utilities
         private AwsRolesAnyWhereRequesterDetails requesterDetails;
 
-        public Builder(final ObjectMapper objectMapper) {
-            // unused as of now.
-            super(IAMRolesAnywhereSessionsCredentialsProvider::new);
-            this.objectMapper = objectMapper;
-            this.objectMapper(objectMapper);
+        public Builder(final IAMRolesAnywhereSessionsCredentialsProvider provider) {
+            super(IAMRolesAnywhereSessionsCredentialsProvider::new, provider);
+            super.objectMapper(new ObjectMapper());
         }
 
         @SneakyThrows
@@ -131,7 +128,6 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
             this.initRestClientBasedOnRegion();
             // the following setters are dormant, there is a wrapper AwsRolesAnyWhereRequesterDetails, wrapping all the values.
             this.awsRolesAnywhereProperties = awsRolesAnywhereProperties;
-            this.objectMapper = objectMapper;
             this.objectMapper(objectMapper);
             this.region = awsRolesAnywhereProperties.getRegion();
             this.durationSeconds = awsRolesAnywhereProperties.getDurationSeconds();
@@ -142,7 +138,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
             this.encodedX509Certificate = awsRolesAnywhereProperties.getEncodedX509Certificate();
             this.x509CertificateChain = resolveCertificateChain(awsRolesAnywhereProperties.getEncodedX509Certificate());
             this.privateKey = extractPrivateKey(this.awsRolesAnywhereProperties.getEncodedPrivateKey());
-            this.host = resolveHostBasedOnRegion(this.awsRegion);
+            this.host = AwsX509SigningHelper.resolveHostBasedOnRegion(this.awsRegion);
             initRequest();
         }
 
@@ -193,12 +189,11 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         }
 
         private void initRequest() {
-            this.awsRolesAnywhereSessionsRequest = awsRolesAnywhereSessionsRequest(
-                    this.roleArn,
-                    this.profileArn,
-                    this.trustAnchorArn,
-                    this.durationSeconds
-            );
+            this.awsRolesAnywhereSessionsRequest = new AwsRolesAnywhereSessionsRequest()
+                    .setRoleArn(this.roleArn)
+                    .setProfileArn(this.profileArn)
+                    .setTrustAnchorArn(this.trustAnchorArn)
+                    .setDurationSeconds(this.durationSeconds);
         }
 
         private void initRestClientBasedOnRegion() {
@@ -210,7 +205,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
 
         @Override
         public IAMRolesAnywhereSessionsCredentialsProvider build() {
-            var requesterDetails = AwsRolesAnyWhereRequesterDetails.builder()
+            this.requesterDetails = AwsRolesAnyWhereRequesterDetails.builder()
                     .durationSeconds(durationSeconds)
                     .certificateChain(this.x509CertificateChain)
                     .privateKey(this.privateKey)
@@ -223,8 +218,6 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
                     .profileArn(this.profileArn)
                     .roleSessionName(this.roleSessionName)
                     .build();
-            initRequest();
-            this.requesterDetails = requesterDetails;
             return super.build();
         }
     }

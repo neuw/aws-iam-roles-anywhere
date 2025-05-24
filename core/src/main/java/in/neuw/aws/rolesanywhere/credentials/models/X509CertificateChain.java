@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 import java.security.cert.X509Certificate;
 
 /**
- * This class is primarily needed for chain of certs in case of the client cert was signed by an intermediate instead of root
+ * This class is primarily needed for a chain of certs in case of the client cert was signed by an intermediate instead of root
  */
 @Getter
 @Setter

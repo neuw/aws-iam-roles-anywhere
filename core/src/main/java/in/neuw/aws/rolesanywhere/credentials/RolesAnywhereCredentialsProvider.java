@@ -147,6 +147,15 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
         // disabled by default
         private boolean prefetch;
 
+        BaseBuilder(Function<B, T> providerConstructor, RolesAnywhereCredentialsProvider provider) {
+            this.providerConstructor = providerConstructor;
+            this.prefetchTime = provider.prefetchTime;
+            this.asyncCredentialUpdateEnabled = provider.asyncCredentialUpdateEnabled;
+            this.sdkHttpClient = provider.sdkHttpClient;
+            this.staleTime = provider.staleTime;
+            this.objectMapper = provider.objectMapper;
+        }
+
         BaseBuilder(Function<B, T> providerConstructor) {
             this.providerConstructor = providerConstructor;
         }
