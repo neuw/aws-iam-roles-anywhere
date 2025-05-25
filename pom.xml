@@ -182,7 +182,7 @@
         <extensions>true</extensions>
         <configuration>
           <autoPublish>true</autoPublish>
-          <deploymentName>deploy-24th-may-2025-${version}-1</deploymentName>
+          <deploymentName>deploy-24th-may-2025-${project.version}-1</deploymentName>
           <publishingServerId>central</publishingServerId>
           <skipPublishing>false</skipPublishing>
           <waitUntil>validated</waitUntil>
