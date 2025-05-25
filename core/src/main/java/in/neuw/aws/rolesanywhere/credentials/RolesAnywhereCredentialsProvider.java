@@ -143,7 +143,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
         private SdkHttpClient sdkHttpClient;
         private ObjectMapper objectMapper;
         private Duration staleTime;
-        private Duration prefetchTime;
+        private Duration prefetchTime = Duration.ofMinutes(5);
         // disabled by default
         private boolean prefetch;
 

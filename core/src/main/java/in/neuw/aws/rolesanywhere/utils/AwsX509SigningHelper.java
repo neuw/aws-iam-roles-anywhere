@@ -22,11 +22,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -68,7 +67,7 @@ public class AwsX509SigningHelper {
     }
 
     public static byte[] hash(final String text) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance(SHA_256);
+        var digest = MessageDigest.getInstance(SHA_256);
         return digest.digest(text.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -86,9 +85,9 @@ public class AwsX509SigningHelper {
                                           final String uri,
                                           final String body,
                                           final X509CertificateChain x509CertificateChain) throws NoSuchAlgorithmException, CertificateException, NoSuchProviderException {
-        String dateAndTime = getDateAndTime(instant);
-        String canonicalHeaders;
-        StringBuilder canonicalRequestBuilder = new StringBuilder();
+        var dateAndTime = getDateAndTime(instant);
+        var canonicalHeaders = "";
+        var canonicalRequestBuilder = new StringBuilder();
         canonicalRequestBuilder.append(method).append(LINE_SEPARATOR)
                 .append(uri).append(LINE_SEPARATOR)
                 .append(EMPTY_STRING).append(LINE_SEPARATOR);
@@ -125,11 +124,11 @@ public class AwsX509SigningHelper {
         return BinaryUtils.toHex(hash(canonicalRequest));
     }
 
-    public static Map<String, String> canonicalHeaders(final String host,
+    public static SortedMap<String, String> canonicalHeaders(final String host,
                                                        final String contentType,
                                                        final String date,
                                                        final String derX509) {
-        Map<String, String> headers = new TreeMap<>();
+        var headers = new TreeMap<String, String>();
         headers.put(CONTENT_TYPE.toLowerCase(), contentType);
         headers.put(HOST.toLowerCase(), host);
         headers.put(X_AMZ_DATE.toLowerCase(), date);
@@ -141,7 +140,7 @@ public class AwsX509SigningHelper {
                                                final String contentType,
                                                final String date,
                                                final String derX509) {
-        Map<String, String> headers = canonicalHeaders(host, contentType, date, derX509);
+        var headers = canonicalHeaders(host, contentType, date, derX509);
         return headers.entrySet().stream()
                 .map(entry -> entry.getKey() + ":" + entry.getValue())
                 .collect(Collectors.joining(LINE_SEPARATOR)) + LINE_SEPARATOR;
@@ -152,7 +151,7 @@ public class AwsX509SigningHelper {
                                                final String date,
                                                final String derX509,
                                                final String chainDerX509CommaSeparated) {
-        Map<String, String> headers = canonicalHeaders(host, contentType, date, derX509);
+        var headers = canonicalHeaders(host, contentType, date, derX509);
         headers.put(X_AMZ_X509_CHAIN.toLowerCase(), chainDerX509CommaSeparated);
         return headers.entrySet().stream()
                 .map(entry -> entry.getKey() + ":" + entry.getValue())
@@ -173,7 +172,7 @@ public class AwsX509SigningHelper {
 
     public static String credentialScope(final Instant instant,
                                          final Region region) {
-        String credentialScope = getDate(instant) + "/" + region.id() + "/" + ROLES_ANYWHERE_SERVICE + "/" + AWS4_TERMINATOR;
+        var credentialScope = getDate(instant) + "/" + region.id() + "/" + ROLES_ANYWHERE_SERVICE + "/" + AWS4_TERMINATOR;
         log.debug("credentialScope: {}", credentialScope);
         return credentialScope;
     }
@@ -191,11 +190,11 @@ public class AwsX509SigningHelper {
 
     public static String sign(final String contentToSign,
                               final PrivateKey key) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        Signature signature = Signature.getInstance(resolveSignatureAlgorithm(key));
+        var signature = Signature.getInstance(resolveSignatureAlgorithm(key));
         signature.initSign(key);
 
         signature.update(contentToSign.getBytes(StandardCharsets.UTF_8));
-        byte[] signatureBytes = signature.sign();
+        var signatureBytes = signature.sign();
         return BinaryUtils.toHex(signatureBytes);
     }
 
@@ -210,18 +209,16 @@ public class AwsX509SigningHelper {
         var credentialPart = certId+"/"+credentialScope(instant, region);
         var signedContent = sign(contentToSign, key);
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(algorithm)
-                .append(" ")
-                .append(CREDENTIAL_PREFIX)
-                .append(credentialPart)
-                .append(CREDENTIALS_DE_LIMITER)
-                .append(SIGNED_HEADERS_PREFIX)
-                .append(signedHeaders)
-                .append(CREDENTIALS_DE_LIMITER)
-                .append(SIGNATURE_PREFIX)
-                .append(signedContent);
-        return builder.toString();
+        return algorithm +
+                " " +
+                CREDENTIAL_PREFIX +
+                credentialPart +
+                CREDENTIALS_DE_LIMITER +
+                SIGNED_HEADERS_PREFIX +
+                signedHeaders +
+                CREDENTIALS_DE_LIMITER +
+                SIGNATURE_PREFIX +
+                signedContent;
     }
 
     public static AwsRolesAnywhereSessionsResponse getIamRolesAnywhereSessions(
@@ -257,14 +254,7 @@ public class AwsX509SigningHelper {
 
             // Read and print response body
             if (requestSpec.responseBody().isPresent()) {
-                try (InputStream content = requestSpec.responseBody().get()) {
-                    String responseBody = IoUtils.toUtf8String(content);
-                    log.debug("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
-                    return om.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
-                } catch (IOException e) {
-                    log.error("Error reading response body for AWS roles anywhere sessions endpoint: {}", e.getMessage());
-                    throw new RuntimeException("Error reading response body for AWS roles anywhere sessions endpoint");
-                }
+                return getAwsRolesAnywhereSessionsResponse(om, requestSpec);
             } else {
                 log.error("Error reading response body for AWS roles anywhere sessions endpoint: NO response body");
                 throw new RuntimeException("Error reading response body for AWS roles anywhere sessions endpoint");
@@ -272,6 +262,17 @@ public class AwsX509SigningHelper {
 
         } catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | CertificateException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(ObjectMapper om, HttpExecuteResponse requestSpec) {
+        try (var content = requestSpec.responseBody().get()) {
+            var responseBody = IoUtils.toUtf8String(content);
+            log.debug("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
+            return om.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
+        } catch (IOException e) {
+            log.error("Error reading response body for AWS roles anywhere sessions endpoint: {}", e.getMessage());
+            throw new RuntimeException("Error reading response body for AWS roles anywhere sessions endpoint");
         }
     }
 

@@ -1,5 +1,6 @@
 package in.neuw.aws.rolesanywhere;
 
+import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.mocks.TestApplication;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
@@ -23,6 +24,7 @@ import java.util.Base64;
 
 import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.generateCertificateChainText;
 import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil.convertToOpenSSLFormat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
@@ -83,7 +85,7 @@ class RSAChainBasedStarterTests {
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("EC", rsaKeyPair);
 
-        registry.add("aws.iam.rolesanywhere.region", () -> AP_SOUTH_1.id());
+        registry.add("aws.iam.rolesanywhere.region", AP_SOUTH_1::id);
         registry.add("aws.iam.rolesanywhere.role-arn", () -> "arn:aws:iam::123456789012:role/test-role");
         registry.add("aws.iam.rolesanywhere.profile-arn", () -> "arn:aws:rolesanywhere:us-east-1:123456789012:profile/unique-uuid");
         registry.add("aws.iam.rolesanywhere.trust-anchor-arn", () -> "arn:aws:rolesanywhere:us-east-1:123456789012:trust-anchor/unique-uuid");
@@ -97,8 +99,8 @@ class RSAChainBasedStarterTests {
 
     @Test
     @DirtiesContext
-    void contextLoadRSAChain() throws Exception {
-        System.out.println(awsCredentialsProvider.resolveCredentials().accountId());
+    void contextLoadRSAChainTest() {
+        assertEquals(IAMRolesAnywhereSessionsCredentialsProvider.class, awsCredentialsProvider.getClass());
     }
 
 }

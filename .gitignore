@@ -5,6 +5,7 @@ target/
 
 ### IntelliJ IDEA ###
 /.idea/*.xml
+.idea/*.xml
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -39,3 +40,4 @@ build/
 ### Mac OS ###
 .DS_Store
 /.idea/
+/.scannerwork/

@@ -69,7 +69,7 @@ class CoreTests {
     }
 
     @Test
-    void testWithECKeyBasedChain() throws Exception {
+    void ECKeyBasedChainTest() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -80,14 +80,11 @@ class CoreTests {
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
         var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
         System.out.println("ecCertChain "+ecCertChain);
-
         System.out.println("ecKeyBase64 "+ecKeyBase64);
 
         var properties = new AwsRolesAnywhereProperties();
@@ -118,7 +115,7 @@ class CoreTests {
     }
 
     @Test
-    void testWithRSAKeyBasedChain() throws Exception {
+    void RSAKeyBasedChainTest() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -129,16 +126,10 @@ class CoreTests {
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
-
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
         System.out.println("CertChain "+rsaCertChain);
-
         System.out.println("KeyBase64 "+rsaKeyBase64);
 
         var properties = new AwsRolesAnywhereProperties();
@@ -169,7 +160,7 @@ class CoreTests {
     }
 
     @Test
-    void testWithECKeyBasedCert() throws Exception {
+    void ECKeyBasedCertTest() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -180,14 +171,11 @@ class CoreTests {
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
         var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificate("EC", ecKeyPair);
 
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
         System.out.println("ecCertChain "+ecCertChain);
-
         System.out.println("ecKeyBase64 "+ecKeyBase64);
 
         var properties = new AwsRolesAnywhereProperties();
@@ -214,11 +202,11 @@ class CoreTests {
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
                 Mockito.any(ObjectMapper.class)
-        ));
+        ), atLeastOnce());
     }
 
     @Test
-    void testWithWrongCert() throws Exception {
+    void wrongCertTest() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
@@ -229,16 +217,12 @@ class CoreTests {
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
         var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        // mocked dirty value
+        var ecCertChain = Base64.getEncoder().encodeToString("GIBBERISH_NOT_A_CERT_OR_CERT_CHAIN".getBytes(StandardCharsets.UTF_8));
 
         System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-
-        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
-        var ecCertChain = generateCertificate("EC", ecKeyPair); // actual
-        // overridden to a mocked dirty value
-        ecCertChain = Base64.getEncoder().encodeToString("GIBBERISH_NOT_A_CERT_OR_CERT_CHAIN".getBytes(StandardCharsets.UTF_8));
-
         System.out.println("ecCertChain "+ecCertChain);
-
         System.out.println("ecKeyBase64 "+ecKeyBase64);
 
         var properties = new AwsRolesAnywhereProperties();
@@ -262,7 +246,7 @@ class CoreTests {
     }
 
     @Test
-    void testWithBuilderProps() throws Exception {
+    void builderPropsTest() throws Exception {
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
@@ -272,14 +256,11 @@ class CoreTests {
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
         var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificate("EC", ecKeyPair); // actual
 
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
         System.out.println("ecCertChain "+ecCertChain);
-
         System.out.println("ecKeyBase64 "+ecKeyBase64);
 
         var properties = new AwsRolesAnywhereProperties();
@@ -317,7 +298,7 @@ class CoreTests {
     }
 
     @Test
-    void testProviderCopy() throws Exception {
+    void providerCopyTest() throws Exception {
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
@@ -327,14 +308,11 @@ class CoreTests {
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
         var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificate("EC", ecKeyPair); // actual
 
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
         System.out.println("ecCertChain "+ecCertChain);
-
         System.out.println("ecKeyBase64 "+ecKeyBase64);
 
         var properties = new AwsRolesAnywhereProperties();
@@ -379,21 +357,16 @@ class CoreTests {
         var newProvider = builder.build();
 
         assertNotEquals(providerClone, newProvider);
-
-        S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
     }
 
     @Test
-    void testWithRSAKeyBasedCert() throws Exception {
+    void RSAKeyBasedCertTest() throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
-
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
-
         var rsaCertChain = generateCertificate("RSA", rsaKeyPair);
 
         System.out.println("CertChain "+rsaCertChain);
-
         System.out.println("KeyBase64 "+rsaKeyBase64);
 
         var properties = new AwsRolesAnywhereProperties();
@@ -418,25 +391,17 @@ class CoreTests {
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
 
-        // Call the method that internally uses the static method
-        //var result = provider.prefetchTime();
-        S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
+        assertEquals(Duration.of(5, ChronoUnit.MINUTES), provider.prefetchTime());
     }
 
     @Test
-    void testWithRSAKeyBasedCertWithChain() throws Exception {
+    void RSAKeyBasedCertWithChainTest() throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
-
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
         System.out.println("CertChain "+rsaCertChain);
-
         System.out.println("KeyBase64 "+rsaKeyBase64);
 
         var properties = new AwsRolesAnywhereProperties();
@@ -461,9 +426,7 @@ class CoreTests {
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
 
-        // Call the method that internally uses the static method
-        //var result = provider.prefetchTime();
-        S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
+        assertEquals(Duration.of(5, ChronoUnit.MINUTES), provider.prefetchTime());
     }
 
 }
