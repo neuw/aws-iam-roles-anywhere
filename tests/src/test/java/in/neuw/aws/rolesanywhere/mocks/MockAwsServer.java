@@ -33,7 +33,11 @@ public class MockAwsServer {
                 WireMockConfiguration
                         .options()
                         .port(port)
-                        .extensions(new AWSRolesAnywhereMockTransformer())
+                        .extensions(
+                                new AWSRolesAnywhereMockTransformer(),
+                                new AWSRolesAnywhereMockTransformerError(),
+                                new AWSRolesAnywhereMockTransformerNoBody()
+                        )
         );
         instance.start();
 
@@ -45,6 +49,21 @@ public class MockAwsServer {
                                 .withStatus(201)
                                 .withHeader("Content-Type", "application/json")
                                 .withTransformers("aws-rolesanywhere-mock"))
+        );
+
+        instance.stubFor(post(urlPathEqualTo(SESSIONS_URI+"-empty-response"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(201)
+                                .withTransformers("aws-rolesanywhere-mock-empty-response"))
+        );
+
+        instance.stubFor(post(urlPathEqualTo(SESSIONS_URI+"-error-response"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(500)
+                                .withHeader("Content-Type", "application/json")
+                                .withTransformers("aws-rolesanywhere-mock-error-response"))
         );
         // stop mock server
         Runtime.getRuntime().addShutdownHook(new Thread(instance::stop));
@@ -72,6 +91,51 @@ public class MockAwsServer {
         @Override
         public String getName() {
             return "aws-rolesanywhere-mock";
+        }
+    }
+
+    public static class AWSRolesAnywhereMockTransformerError implements ResponseTransformerV2 {
+        @Override
+        public Response transform(Response response, ServeEvent serveEvent) {
+            System.out.println("request body received = "+serveEvent.getRequest().getBodyAsString());
+            var data = mockAwsRolesAnywhereSessionsResponse();
+            try {
+                return Response.Builder.like(response)
+                        .body(objectMapper.writeValueAsString(data))
+                        .build();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public boolean applyGlobally() {
+            return false;
+        }
+
+        @Override
+        public String getName() {
+            return "aws-rolesanywhere-mock-error-response";
+        }
+    }
+
+    // why would this happen? do not know! but only for unit test condition!
+    public static class AWSRolesAnywhereMockTransformerNoBody implements ResponseTransformerV2 {
+        @Override
+        public Response transform(Response response, ServeEvent serveEvent) {
+            System.out.println("request body received = "+serveEvent.getRequest().getBodyAsString());
+            return Response.Builder.like(response)
+                    .build();
+        }
+
+        @Override
+        public boolean applyGlobally() {
+            return false;
+        }
+
+        @Override
+        public String getName() {
+            return "aws-rolesanywhere-mock-empty-response";
         }
     }
 

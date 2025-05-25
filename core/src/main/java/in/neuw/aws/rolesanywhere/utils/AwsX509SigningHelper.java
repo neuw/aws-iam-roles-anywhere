@@ -253,27 +253,26 @@ public class AwsX509SigningHelper {
             log.debug("Status Code is {} for AWS roles anywhere session endpoint", requestSpec.httpResponse().statusCode());
 
             // Read and print response body
-            if (requestSpec.responseBody().isPresent()) {
-                return getAwsRolesAnywhereSessionsResponse(om, requestSpec);
-            } else {
-                log.error("Error reading response body for AWS roles anywhere sessions endpoint: NO response body");
-                throw new RuntimeException("Error reading response body for AWS roles anywhere sessions endpoint");
-            }
-
+            return getAwsRolesAnywhereSessionsResponse(om, requestSpec);
         } catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | CertificateException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @SneakyThrows
     private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(ObjectMapper om, HttpExecuteResponse requestSpec) {
-        try (var content = requestSpec.responseBody().get()) {
+        if (requestSpec.responseBody().isPresent()) {
+            var content = requestSpec.responseBody().get();
             var responseBody = IoUtils.toUtf8String(content);
             log.debug("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
             return om.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
-        } catch (IOException e) {
-            log.error("Error reading response body for AWS roles anywhere sessions endpoint: {}", e.getMessage());
-            throw new RuntimeException("Error reading response body for AWS roles anywhere sessions endpoint");
+        } else {
+            throw new RuntimeException("Response body is empty");
         }
+    }
+
+    public static String resolveUri(final Region region) {
+        return resolveHostEndpoint(region) + SESSIONS_URI;
     }
 
     @SneakyThrows
@@ -288,10 +287,9 @@ public class AwsX509SigningHelper {
         InputStream requestBodyStream = new ByteArrayInputStream(jsonBody.getBytes(StandardCharsets.UTF_8));
 
         var awsRegion = requesterDetails.getRegion();
-        var uri = resolveHostEndpoint(awsRegion) + SESSIONS_URI;
 
         SdkHttpFullRequest.Builder sdkHttpFullRequestBuilder = (SdkHttpFullRequest.Builder) SdkHttpFullRequest.builder()
-                .uri(uri)
+                .uri(resolveUri(awsRegion))
                 .method(SdkHttpMethod.POST)
                 .putHeader(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                 .putHeader(X_AMZ_X509, convertToBase64PEMString(requesterDetails.getCertificateChain().getLeafCertificate()))
