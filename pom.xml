@@ -4,10 +4,10 @@
 
   <groupId>in.neuw</groupId>
   <artifactId>aws-iam-roles-anywhere</artifactId>
-  <version>0.4-sb-3.4.3-aws-2.31.8</version>
+  <version>0.4-sb-3.4.4-aws-2.31.8</version>
   <packaging>pom</packaging>
 
-  <!-- 0.4-sb-3.4.3-aws-2.31.8 -->
+  <!-- 0.4-sb-3.4.4-aws-2.31.8 -->
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>AWS IAM roles anywhere credential provider library for Java</description>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>in.neuw</groupId>
         <artifactId>aws-iam-roles-anywhere</artifactId>
-        <version>0.4-sb-3.4.3-aws-2.31.8</version>
+        <version>0.4-sb-3.4.4-aws-2.31.8</version>
     </parent>
 
     <artifactId>tests</artifactId>

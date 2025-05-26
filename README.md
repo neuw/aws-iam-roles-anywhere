@@ -34,8 +34,9 @@ The initial BETA version has been made available over maven here:-
 
 ### Versions
 
-| Version                   | AWS SDK v2 Version | Spring Boot Version |
-|---------------------------|:------------------:|:-------------------:|
-| 0.4-sb-3.4.3-aws-2.31.8   |       2.31.8       |        3.4.3        |
+| Version                 | AWS SDK v2 Version | Spring Boot Version |
+|-------------------------|:------------------:|:-------------------:|
+| 0.4-sb-3.4.3-aws-2.31.8 |       2.31.8       |        3.4.3        |
+| 0.4-sb-3.4.4-aws-2.31.8 |       2.31.8       |        3.4.4        |
 
 
