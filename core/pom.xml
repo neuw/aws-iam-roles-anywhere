@@ -4,7 +4,7 @@
     <parent>
         <groupId>in.neuw</groupId>
         <artifactId>aws-iam-roles-anywhere</artifactId>
-        <version>0.4-sb-3.4.4-aws-2.31.9</version>
+        <version>0.4-sb-3.4.5-aws-2.31.29</version>
     </parent>
 
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
