@@ -4,10 +4,8 @@
 
   <groupId>in.neuw</groupId>
   <artifactId>aws-iam-roles-anywhere</artifactId>
-  <version>0.4-sb-3.4.4-aws-2.31.8</version>
+  <version>0.4-sb-3.4.4-aws-2.31.9</version>
   <packaging>pom</packaging>
-
-  <!-- 0.4-sb-3.4.4-aws-2.31.8 -->
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>AWS IAM roles anywhere credential provider library for Java</description>
@@ -41,8 +39,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <aws-sdk.version>2.31.8</aws-sdk.version>
-    <spring-boot.version>3.4.3</spring-boot.version>
+    <aws-sdk.version>2.31.9</aws-sdk.version>
+    <spring-boot.version>3.4.4</spring-boot.version>
     <java.version>17</java.version>
     <parent.version>${project.version}</parent.version>
     <jackson-bom.version>2.18.2</jackson-bom.version>
