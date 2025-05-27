@@ -28,7 +28,7 @@ The initial BETA version has been made available over maven here:-
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>0.4-sb-3.4.3-aws-2.31.8</version>
+    <version>0.4-2.31.50</version>
 </dependency>
 ```
 
