@@ -5,11 +5,12 @@
     <parent>
         <groupId>in.neuw</groupId>
         <artifactId>aws-iam-roles-anywhere</artifactId>
-        <version>0.4-sb-3.4.6-aws-2.31.48</version>
+        <version>0.4-2.31.50</version>
     </parent>
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
+    <version>0.4-${spring-boot.version}</version>
     <description>AWS IAM roles anywhere credential provider spring boot starter library</description>
     <url>https://github.com/neuw/aws-iam-roles-anywhere</url>
 
@@ -42,7 +43,7 @@
         <dependency>
             <groupId>in.neuw</groupId>
             <artifactId>aws-iam-roles-anywhere-core</artifactId>
-            <version>${parent.version}</version>
+            <version>0.4-2.31.50</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
