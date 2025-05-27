@@ -4,7 +4,7 @@
 
   <groupId>in.neuw</groupId>
   <artifactId>aws-iam-roles-anywhere</artifactId>
-  <version>0.4-2.31.50</version>
+  <version>0.4.5</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -42,7 +42,6 @@
     <aws-sdk.version>2.31.50</aws-sdk.version>
     <spring-boot.version>3.5.0</spring-boot.version>
     <java.version>17</java.version>
-    <artifact.number>0.4</artifact.number>
     <parent.version>${project.version}</parent.version>
     <jackson-bom.version>2.18.2</jackson-bom.version>
     <maven.compiler.source>17</maven.compiler.source>
@@ -84,6 +83,7 @@
       <dependency>
         <groupId>in.neuw</groupId>
         <artifactId>aws-iam-roles-anywhere-starter</artifactId>
+        <version>${parent.version}</version>
       </dependency>
 
     </dependencies>
@@ -184,7 +184,7 @@
         <extensions>true</extensions>
         <configuration>
           <autoPublish>true</autoPublish>
-          <deploymentName>deploy-${build.date}-${aws-sdk.version}-1</deploymentName>
+          <deploymentName>deploy-${build.date}-${version}-${aws-sdk.version}-${spring-boot.version}-1</deploymentName>
           <publishingServerId>central</publishingServerId>
           <skipPublishing>false</skipPublishing>
           <waitUntil>validated</waitUntil>
