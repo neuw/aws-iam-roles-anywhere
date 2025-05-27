@@ -49,6 +49,8 @@
     <maven.compiler.target>17</maven.compiler.target>
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
     <jacoco.version>0.8.10</jacoco.version>
+    <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+    <build.date>${maven.build.timestamp}</build.date>
   </properties>
 
   <dependencyManagement>
@@ -182,7 +184,7 @@
         <extensions>true</extensions>
         <configuration>
           <autoPublish>true</autoPublish>
-          <deploymentName>deploy-26th-may-2025-${project.version}-1</deploymentName>
+          <deploymentName>deploy-${build.date}-${aws-sdk.version}-1</deploymentName>
           <publishingServerId>central</publishingServerId>
           <skipPublishing>false</skipPublishing>
           <waitUntil>validated</waitUntil>
