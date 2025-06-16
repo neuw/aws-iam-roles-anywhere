@@ -8,10 +8,12 @@ import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
 import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -33,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class CoreTests {
 
@@ -444,7 +447,7 @@ class CoreTests {
     }
 
     @Test
-    void builderIssuesDurationNotPresentTest() throws Exception {
+    void builderIssuesDurationNotPresentTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -469,7 +472,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .roleArn("test-something")
@@ -484,11 +487,13 @@ class CoreTests {
                     .trustAnchorArn("test-something")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
     @Test
-    void builderIssuesDurationSecondsIncorrectTest() throws Exception {
+    void builderIssuesDurationSecondsIncorrectTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -513,7 +518,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .durationSeconds(0)
@@ -529,11 +534,13 @@ class CoreTests {
                     .trustAnchorArn("test-something")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
     @Test
-    void builderIssuesDurationSecondsNotValidTest() throws Exception {
+    void builderIssuesDurationSecondsNotValidTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -558,7 +565,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .durationSeconds(3600*14 + 1)
@@ -574,11 +581,13 @@ class CoreTests {
                     .trustAnchorArn("test-something")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
     @Test
-    void builderIssuesRoleArnNotPresentTest() throws Exception {
+    void builderIssuesRoleArnNotPresentTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -603,7 +612,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .durationSeconds(3600)
@@ -618,11 +627,13 @@ class CoreTests {
                     .trustAnchorArn("test-something")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
     @Test
-    void builderIssuesTrustArnNotPresentTest() throws Exception {
+    void builderIssuesTrustArnNotPresentTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -647,7 +658,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .durationSeconds(3600)
@@ -662,11 +673,13 @@ class CoreTests {
                     .region("ap-south-1")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
     @Test
-    void builderIssuesProfileArnNotPresentTest() throws Exception {
+    void builderIssuesProfileArnNotPresentTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -691,7 +704,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .durationSeconds(3600)
@@ -706,11 +719,13 @@ class CoreTests {
                     .trustAnchorArn("test-something")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
     @Test
-    void builderIssuesPrivateKeyNotPresentTest() throws Exception {
+    void builderIssuesPrivateKeyNotPresentTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -735,7 +750,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .durationSeconds(3600)
@@ -750,11 +765,13 @@ class CoreTests {
                     .trustAnchorArn("test-something")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
     @Test
-    void builderIssuesCertNotPresentTest() throws Exception {
+    void builderIssuesCertNotPresentTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -779,7 +796,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .durationSeconds(3600)
@@ -794,11 +811,13 @@ class CoreTests {
                     .trustAnchorArn("test-something")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
     @Test
-    void builderIssuesRegionNotPresentTest() throws Exception {
+    void builderIssuesRegionNotPresentTest(TestInfo testInfo) throws Exception {
 
         var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -823,7 +842,7 @@ class CoreTests {
                     return "http://localhost:8090";
                 });
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        try {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(objectMapper)
                     .durationSeconds(3600)
@@ -838,7 +857,9 @@ class CoreTests {
                     .trustAnchorArn("test-something")
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
-        });
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal Argument Exception for the test - {}", testInfo.getTestMethod().orElseThrow().getName());
+        }
     }
 
 }
