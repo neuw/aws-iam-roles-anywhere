@@ -344,6 +344,13 @@ class CoreTests {
                 .build();
 
         var providerClone = provider.copy(p -> {
+            p.durationSeconds(3600);
+            p.region("ap-south-1");
+            p.trustAnchorArn("test-something");
+            p.profileArn("test-something");
+            p.encodedPrivateKey(ecKeyBase64);
+            p.encodedX509Certificate(ecCertChain);
+            p.roleArn("test-something");
             p.roleSessionName("something-else");
         });
 
@@ -354,7 +361,14 @@ class CoreTests {
 
         var builder = provider.toBuilder();
         builder.roleSessionName("some-other-value");
-        var newProvider = builder.build();
+        var newProvider = builder.durationSeconds(3600)
+                .region("ap-south-1")
+                .trustAnchorArn("test-something")
+                .roleArn("test-something")
+                .profileArn("test-something")
+                .encodedPrivateKey(ecKeyBase64)
+                .encodedX509Certificate(ecCertChain)
+                .build();
 
         assertNotEquals(providerClone, newProvider);
     }
@@ -427,6 +441,404 @@ class CoreTests {
                 .build();
 
         assertEquals(Duration.of(5, ChronoUnit.MINUTES), provider.prefetchTime());
+    }
+
+    @Test
+    void builderIssuesDurationNotPresentTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .roleArn("test-something")
+                    .profileArn("test-something")
+                    .encodedPrivateKey(rsaKeyBase64)
+                    .encodedX509Certificate(rsaCertChain)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .region("ap-south-1")
+                    .trustAnchorArn("test-something")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void builderIssuesDurationSecondsIncorrectTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .durationSeconds(0)
+                    .roleArn("test-something")
+                    .profileArn("test-something")
+                    .encodedPrivateKey(rsaKeyBase64)
+                    .encodedX509Certificate(rsaCertChain)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .region("ap-south-1")
+                    .trustAnchorArn("test-something")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void builderIssuesDurationSecondsNotValidTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .durationSeconds(3600*14 + 1)
+                    .roleArn("test-something")
+                    .profileArn("test-something")
+                    .encodedPrivateKey(rsaKeyBase64)
+                    .encodedX509Certificate(rsaCertChain)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .region("ap-south-1")
+                    .trustAnchorArn("test-something")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void builderIssuesRoleArnNotPresentTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .durationSeconds(3600)
+                    .profileArn("test-something")
+                    .encodedPrivateKey(rsaKeyBase64)
+                    .encodedX509Certificate(rsaCertChain)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .region("ap-south-1")
+                    .trustAnchorArn("test-something")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void builderIssuesTrustArnNotPresentTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .durationSeconds(3600)
+                    .roleArn("test-something")
+                    .profileArn("test-something")
+                    .encodedPrivateKey(rsaKeyBase64)
+                    .encodedX509Certificate(rsaCertChain)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .region("ap-south-1")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void builderIssuesProfileArnNotPresentTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .durationSeconds(3600)
+                    .roleArn("test-something")
+                    .encodedPrivateKey(rsaKeyBase64)
+                    .encodedX509Certificate(rsaCertChain)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .region("ap-south-1")
+                    .trustAnchorArn("test-something")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void builderIssuesPrivateKeyNotPresentTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .durationSeconds(3600)
+                    .roleArn("test-something")
+                    .profileArn("test-something")
+                    .encodedX509Certificate(rsaCertChain)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .region("ap-south-1")
+                    .trustAnchorArn("test-something")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void builderIssuesCertNotPresentTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .durationSeconds(3600)
+                    .roleArn("test-something")
+                    .profileArn("test-something")
+                    .encodedPrivateKey(rsaKeyBase64)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .region("ap-south-1")
+                    .trustAnchorArn("test-something")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void builderIssuesRegionNotPresentTest() throws Exception {
+
+        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
+                .thenAnswer(invocation -> {
+                    return "http://localhost:8090";
+                });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(objectMapper)
+                    .durationSeconds(3600)
+                    .roleArn("test-something")
+                    .profileArn("test-something")
+                    .encodedPrivateKey(rsaKeyBase64)
+                    .encodedX509Certificate(rsaCertChain)
+                    .roleSessionName("something")
+                    .prefetchTime(Duration.of(3, ChronoUnit.MINUTES))
+                    .prefetch(false)
+                    .staleTime(Duration.of(1, ChronoUnit.MINUTES))
+                    .trustAnchorArn("test-something")
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
     }
 
 }

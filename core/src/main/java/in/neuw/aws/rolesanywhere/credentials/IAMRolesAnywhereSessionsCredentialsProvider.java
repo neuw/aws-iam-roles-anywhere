@@ -14,6 +14,7 @@ import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.utils.StringUtils;
 import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
 
 import java.security.PrivateKey;
@@ -94,6 +95,8 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
 
     @NotThreadSafe
     public static final class Builder extends BaseBuilder<Builder, IAMRolesAnywhereSessionsCredentialsProvider> {
+
+        private final Integer allowedMaxDurationInSeconds = 3600 * 14;
         private AwsRolesAnywhereSessionsRequest awsRolesAnywhereSessionsRequest;
         private AwsRolesAnywhereProperties awsRolesAnywhereProperties;
         private String roleArn;
@@ -122,7 +125,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
             super(IAMRolesAnywhereSessionsCredentialsProvider::new);
             this.awsRegion = Region.of(awsRolesAnywhereProperties.getRegion());
             // the awsRegion has to be initialized first for the Rest Client
-            this.initRestClientBasedOnRegion();
+            this.initRestClient();
             // the following setters are dormant, there is a wrapper AwsRolesAnyWhereRequesterDetails, wrapping all the values.
             this.awsRolesAnywhereProperties = awsRolesAnywhereProperties;
             this.objectMapper(objectMapper);
@@ -136,14 +139,20 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
             this.x509CertificateChain = resolveCertificateChain(awsRolesAnywhereProperties.getEncodedX509Certificate());
             this.privateKey = extractPrivateKey(this.awsRolesAnywhereProperties.getEncodedPrivateKey());
             this.host = AwsX509SigningHelper.resolveHostBasedOnRegion(this.awsRegion);
-            initRequest();
+        }
+
+        @SneakyThrows
+        public Builder(final ObjectMapper objectMapper) {
+            super(IAMRolesAnywhereSessionsCredentialsProvider::new);
+            this.initRestClient();
+            this.objectMapper(objectMapper);
         }
 
         public Builder region(final String region) {
             this.region = region;
             this.awsRegion = Region.of(region);
             // the awsRegion has to be initialized first for the Rest Client
-            this.initRestClientBasedOnRegion();
+            this.initRestClient();
             return this;
         }
 
@@ -193,7 +202,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
                     .setDurationSeconds(this.durationSeconds);
         }
 
-        private void initRestClientBasedOnRegion() {
+        private void initRestClient() {
             this.sdkHttpClient(
                     ApacheHttpClient.builder()
                             .maxConnections(100).build()
@@ -202,6 +211,8 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
 
         @Override
         public IAMRolesAnywhereSessionsCredentialsProvider build() {
+            // validate the important properties here!
+            validateImportantFields();
             this.requesterDetails = AwsRolesAnyWhereRequesterDetails.builder()
                     .durationSeconds(durationSeconds)
                     .certificateChain(this.x509CertificateChain)
@@ -215,7 +226,37 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
                     .profileArn(this.profileArn)
                     .roleSessionName(this.roleSessionName)
                     .build();
+            initRequest();
             return super.build();
+        }
+
+        public void validateImportantFields() {
+            if (this.durationSeconds == null) {
+                throw new IllegalArgumentException("durationSeconds cannot be null");
+            }
+            if (this.durationSeconds <= 0 || this.durationSeconds > this.allowedMaxDurationInSeconds) {
+                throw new IllegalArgumentException("durationSeconds must be between 0 and "+ allowedMaxDurationInSeconds  + "in seconds");
+            }
+
+            if (StringUtils.isBlank(region)) {
+                throw new IllegalArgumentException("region cannot be blank");
+            }
+
+            if (StringUtils.isBlank(this.roleArn)) {
+                throw new IllegalArgumentException("roleArn cannot be blank");
+            }
+            if (StringUtils.isBlank(this.profileArn)) {
+                throw new IllegalArgumentException("profileArn cannot be blank");
+            }
+            if (StringUtils.isBlank(this.trustAnchorArn)) {
+                throw new IllegalArgumentException("trustAnchorArn cannot be blank");
+            }
+            if (StringUtils.isBlank(this.encodedPrivateKey)) {
+                throw new IllegalArgumentException("encodedPrivateKey cannot be blank");
+            }
+            if (StringUtils.isBlank(this.encodedX509Certificate)) {
+                throw new IllegalArgumentException("encodedPrivateKey cannot be blank");
+            }
         }
     }
 }
