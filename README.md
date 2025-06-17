@@ -14,21 +14,41 @@ That tool cannot be shipped along with the code.
 
 This library removes the requirement of that external utility/ tool to load temporary credentials.
 
-Structure of the library is quite straight forward:-
+The Structure of the library is quite straight forward: -
 
 ➬ A parent pom! Maintains the common most versions of libraries.
 
-➬ A core library - based on AWS SDK, and uses APACHE http client for http call.
+➬ A core library—based on AWS SDK, and uses APACHE http client for http call.
 
 ➬ A Spring Boot starter library that provides AutoConfiguration and uses core library underneath.
 
-The initial BETA version has been made available over maven here:-
+### ➬ Important Instructions for the setting-up certificates, encoding file content, etc.
+
+Refer the [repository](https://github.com/krnbr/roles-anywhere-openssl) for the generation of the ca, certificates, etc.
+
+➬ The code only supports the PKCS1 format as of today!
+
+➬ In future iterations, can try to include PKCS8 as well, but not supported yet! 
+
+### ➬ The initial BETA version has been made available over maven here:-
+
+The core:-
 
 ```
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>0.4-2.31.50</version>
+    <version>0.4.5.1</version>
+</dependency>
+```
+
+The Starter:-
+
+```
+<dependency>
+    <groupId>in.neuw</groupId>
+    <artifactId>aws-iam-roles-anywhere-starter</artifactId>
+    <version>0.4.5.1</version>
 </dependency>
 ```
 
