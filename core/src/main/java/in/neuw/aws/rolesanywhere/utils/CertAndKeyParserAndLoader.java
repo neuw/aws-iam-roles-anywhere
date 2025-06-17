@@ -80,7 +80,7 @@ public class CertAndKeyParserAndLoader {
     }
 
     public static X509CertificateChain resolveCertificateChain(final String base64EncodedCert) throws CertificateException, NoSuchProviderException {
-        X509CertificateChain x509CertificateChain = new X509CertificateChain();
+        var x509CertificateChain = new X509CertificateChain();
         x509CertificateChain.setBase64EncodedCertificate(base64EncodedCert);
         if (possibleChainOfCerts(base64EncodedCert)) {
             var certs = extractCertificates(base64EncodedCert);
@@ -105,7 +105,7 @@ public class CertAndKeyParserAndLoader {
 
     public static String convertToBase64PEMString(X509Certificate x509Cert) {
         Security.addProvider(new BouncyCastleProvider());
-        StringWriter sw = new StringWriter();
+        var sw = new StringWriter();
         try (JcaPEMWriter pw = new JcaPEMWriter(sw)) {
             pw.writeObject(x509Cert);
         } catch (IOException e) {
@@ -115,7 +115,7 @@ public class CertAndKeyParserAndLoader {
     }
 
     public static final PrivateKey extractPrivateKey(final String base64EncodedPrivateKey) {
-        byte[] privateKeyBytes = Base64.getDecoder().decode(base64EncodedPrivateKey);
+        var privateKeyBytes = Base64.getDecoder().decode(base64EncodedPrivateKey);
         try {
             return privateKeyResolver(privateKeyBytes);
         } catch (InvalidKeySpecException | IOException | NoSuchAlgorithmException | NoSuchProviderException e) {
@@ -158,23 +158,39 @@ public class CertAndKeyParserAndLoader {
     public static PrivateKey privateKeyResolver(final byte[] key) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         Security.addProvider(new BouncyCastleProvider());
 
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(key);
+        var byteArrayInputStream = new ByteArrayInputStream(key);
+        var pemParser = new PEMParser(new InputStreamReader(byteArrayInputStream));
+        var inputPemObject = pemParser.readObject();
 
-        PEMParser pemParser = new PEMParser(new InputStreamReader(byteArrayInputStream));
-        PEMKeyPair keyPair = (PEMKeyPair) pemParser.readObject();
-        PrivateKeyInfo privateKeyInfo = keyPair.getPrivateKeyInfo();
-        byte[] encodedKey = privateKeyInfo.getEncoded();
+        PrivateKeyInfo privateKeyInfo;
+        String originalFormat;
 
-        ASN1ObjectIdentifier algorithm = privateKeyInfo.getPrivateKeyAlgorithm().getAlgorithm();
+        if (inputPemObject instanceof PEMKeyPair keyPair) {
+            // Handle PKCS#1 format (RSA PRIVATE KEY, EC PRIVATE KEY, etc.)
+            originalFormat = "PKCS#1";
+            privateKeyInfo = keyPair.getPrivateKeyInfo();
+            log.info("Private key Input format: PKCS#1 (Traditional format)");
+        } else if (inputPemObject instanceof PrivateKeyInfo instancePrivateKeyInfo) {
+            // Handle PKCS#8 format (PRIVATE KEY)
+            originalFormat = "PKCS#8";
+            privateKeyInfo = instancePrivateKeyInfo;
+            log.info("Private key Input format: PKCS#8 (Modern format)");
+        } else {
+            throw new IllegalArgumentException("Unsupported key format: " + inputPemObject.getClass().getName() +
+                    ". Supported formats: PKCS#1 (RSA/EC PRIVATE KEY) and PKCS#8 (PRIVATE KEY)");
+        }
 
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedKey);
+        // Extract algorithm and create key
+        var encodedKey = privateKeyInfo.getEncoded();
+        var algorithm = privateKeyInfo.getPrivateKeyAlgorithm().getAlgorithm();
+        var keyType = resolveKeyType(algorithm);
 
-        KeyFactory keyFactory = KeyFactory.getInstance(resolveKeyType(algorithm), "BC");
-        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-        log.info("Private key algorithm is : {}", privateKey.getAlgorithm());
-        log.info("Private key format is : {}", privateKey.getFormat());
+        var keySpec = new PKCS8EncodedKeySpec(encodedKey);
+        var keyFactory = KeyFactory.getInstance(keyType, "BC");
+        var privateKey = keyFactory.generatePrivate(keySpec);
 
-        log.info("Private key successfully loaded.");
+        log.info("Private key successfully loaded. Original format: {}, Private key algorithm: {}, internal format: {}", originalFormat, privateKey.getAlgorithm(), privateKey.getFormat());
+
         return privateKey;
     }
 

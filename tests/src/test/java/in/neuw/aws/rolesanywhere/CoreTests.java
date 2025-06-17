@@ -7,7 +7,9 @@ import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsRequ
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
+import in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader;
 import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil;
+import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtilV2;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.AfterAll;
@@ -69,6 +71,51 @@ class CoreTests {
             mockedStatic.close();
             mockedStatic = null;
         }
+    }
+
+    @Test
+    void ECKeyBasedChainPKCS8Test() throws Exception {
+        mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
+                        Mockito.any(AwsRolesAnywhereSessionsRequest.class),
+                        Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
+                        Mockito.any(SdkHttpClient.class),
+                        Mockito.any(ObjectMapper.class)
+                )
+        ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
+
+        var ecKeyPair = KeyPairGeneratorUtilV2.generateKeyPair("EC", "secp384r1");
+        var ecKeyBase64 = Base64.getEncoder().encodeToString(KeyPairGeneratorUtilV2.convertToPKCS8Format(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
+
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
+        System.out.println("ecCertChain "+ecCertChain);
+        System.out.println("ecKeyBase64 "+ecKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(ecKeyBase64);
+        properties.setEncodedX509Certificate(ecCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        var provider = new IAMRolesAnywhereSessionsCredentialsProvider
+                .Builder(properties, objectMapper)
+                .prefetch(properties.getPrefetch())
+                .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                .build();
+
+        S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
+
+        mockedStatic.verify(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
+                Mockito.any(AwsRolesAnywhereSessionsRequest.class),
+                Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
+                Mockito.any(SdkHttpClient.class),
+                Mockito.any(ObjectMapper.class)
+        ), atLeastOnce());
     }
 
     @Test
@@ -163,6 +210,51 @@ class CoreTests {
     }
 
     @Test
+    void RSAKeyBasedChainPKCS8Test() throws Exception {
+
+        mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
+                        Mockito.any(AwsRolesAnywhereSessionsRequest.class),
+                        Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
+                        Mockito.any(SdkHttpClient.class),
+                        Mockito.any(ObjectMapper.class)
+                )
+        ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
+
+        var rsaKeyPair = KeyPairGeneratorUtilV2.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(KeyPairGeneratorUtilV2.convertToPKCS8Format(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
+
+        System.out.println("CertChain "+rsaCertChain);
+        System.out.println("KeyBase64 "+rsaKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(rsaKeyBase64);
+        properties.setEncodedX509Certificate(rsaCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        var provider = new IAMRolesAnywhereSessionsCredentialsProvider
+                .Builder(properties, objectMapper)
+                .prefetch(properties.getPrefetch())
+                .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                .build();
+
+        S3Client.builder().credentialsProvider(provider).region(Region.of("ap-south-1")).build();
+
+        mockedStatic.verify(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
+                Mockito.any(AwsRolesAnywhereSessionsRequest.class),
+                Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
+                Mockito.any(SdkHttpClient.class),
+                Mockito.any(ObjectMapper.class)
+        ), atLeastOnce());
+    }
+
+    @Test
     void ECKeyBasedCertTest() throws Exception {
 
         mockedStatic.when(() -> AwsX509SigningHelper.getIamRolesAnywhereSessions(
@@ -206,6 +298,27 @@ class CoreTests {
                 Mockito.any(SdkHttpClient.class),
                 Mockito.any(ObjectMapper.class)
         ), atLeastOnce());
+    }
+
+    @Test
+    void testUnsupportedKeyFormat_Certificate() {
+        String certificatePem = """
+            -----BEGIN CERTIFICATE-----
+            MIIBkTCB+wIJAMlyFqk69v+9MA0GCSqGSIb3DQEBCwUAMBQxEjAQBgNVBAMMCWxv
+            BAMMCWxvY2FsaG9zdDBcMA0GCSqGSIb3DQEBAQUAA0sAMEgCQQDlM8lz3BSDU58N
+            +kO5BFWqr7xUdoOEKBL7bKPPq3wz6kCCJDLM6z6wq+HGz6zdm4k8zF4hO2B8wC0x
+            +6c7V8rlAgMBAAEwDQYJKoZIhvcNAQELBQADQQCX6oVN/rtVsfVKArvNPkl8Hubr
+            BeGnowpdDxdDSn5arhP3NUXwzUft1BibovuP+TxD2QHkveVkr1ebUHeuA==
+            -----END CERTIFICATE-----
+            """;
+
+        byte[] certBytes = Base64.getEncoder().encode(certificatePem.getBytes());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> CertAndKeyParserAndLoader.extractPrivateKey(Base64.getEncoder().encodeToString(certBytes))
+        );
+
     }
 
     @Test

@@ -12,7 +12,7 @@ import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Base64;
 
-public class KeyPairGeneratorUtil {
+public class KeyPairGeneratorUtilV2 {
 
     static {
         Security.addProvider(new BouncyCastleProvider());
@@ -37,17 +37,22 @@ public class KeyPairGeneratorUtil {
         return keyPairGenerator.generateKeyPair();
     }
 
+    // PKCS#1 format methods (existing)
     public static String convertToOpenSSLFormat(PrivateKey privateKey) throws Exception {
+        return convertToPKCS1Format(privateKey);
+    }
+
+    public static String convertToPKCS1Format(PrivateKey privateKey) throws Exception {
         String algorithm = privateKey.getAlgorithm();
 
         return switch (algorithm) {
-            case "EC" -> convertECKeyToOpenSSLFormat(privateKey);
-            case "RSA" -> convertRSAKeyToOpenSSLFormat(privateKey);
+            case "EC" -> convertECKeyToPKCS1Format(privateKey);
+            case "RSA" -> convertRSAKeyToPKCS1Format(privateKey);
             default -> throw new IllegalArgumentException("Unsupported key algorithm: " + algorithm);
         };
     }
 
-    private static String convertECKeyToOpenSSLFormat(PrivateKey privateKey) throws Exception {
+    private static String convertECKeyToPKCS1Format(PrivateKey privateKey) throws Exception {
         byte[] pkcs8Encoded = privateKey.getEncoded();
 
         try (ASN1InputStream asn1InputStream = new ASN1InputStream(new ByteArrayInputStream(pkcs8Encoded))) {
@@ -63,7 +68,7 @@ public class KeyPairGeneratorUtil {
         }
     }
 
-    private static String convertRSAKeyToOpenSSLFormat(PrivateKey privateKey) throws Exception {
+    private static String convertRSAKeyToPKCS1Format(PrivateKey privateKey) throws Exception {
         byte[] pkcs8Encoded = privateKey.getEncoded();
 
         try (ASN1InputStream asn1InputStream = new ASN1InputStream(new ByteArrayInputStream(pkcs8Encoded))) {
@@ -77,6 +82,23 @@ public class KeyPairGeneratorUtil {
 
             return formatPEM(base64Encoded, "RSA PRIVATE KEY");
         }
+    }
+
+    // PKCS#8 format methods (new)
+    public static String convertToPKCS8Format(PrivateKey privateKey) throws Exception {
+        // PKCS#8 is the default format that Java uses - privateKey.getEncoded() returns PKCS#8 DER
+        byte[] pkcs8Encoded = privateKey.getEncoded();
+        String base64Encoded = Base64.getEncoder().encodeToString(pkcs8Encoded);
+        
+        return formatPEM(base64Encoded, "PRIVATE KEY");
+    }
+
+    // Public key methods
+    public static String convertPublicKeyToPEM(PublicKey publicKey) throws Exception {
+        byte[] encoded = publicKey.getEncoded();
+        String base64Encoded = Base64.getEncoder().encodeToString(encoded);
+        
+        return formatPEM(base64Encoded, "PUBLIC KEY");
     }
 
     private static String formatPEM(String base64Encoded, String header) {
@@ -94,14 +116,40 @@ public class KeyPairGeneratorUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        // Example: EC Key with secp384r1 curve
+        System.out.println("=== EC Key Examples (secp384r1) ===");
         KeyPair ecKeyPair = generateKeyPair("EC", "secp384r1");
-        String ecOpenSSLKey = convertToOpenSSLFormat(ecKeyPair.getPrivate());
-        System.out.println("EC Private Key in OpenSSL Format:\n" + ecOpenSSLKey);
+        
+        // PKCS#1 format (traditional OpenSSL format)
+        System.out.println("EC Private Key in PKCS#1 Format:");
+        String ecPKCS1Key = convertToPKCS1Format(ecKeyPair.getPrivate());
+        System.out.println(ecPKCS1Key);
+        
+        // PKCS#8 format (unencrypted)
+        System.out.println("\nEC Private Key in PKCS#8 Format:");
+        String ecPKCS8Key = convertToPKCS8Format(ecKeyPair.getPrivate());
+        System.out.println(ecPKCS8Key);
+        
+        // Public key
+        System.out.println("\nEC Public Key:");
+        String ecPublicKey = convertPublicKeyToPEM(ecKeyPair.getPublic());
+        System.out.println(ecPublicKey);
 
-        // Example: RSA Key with 2048-bit size
+        System.out.println("\n=== RSA Key Examples (2048-bit) ===");
         KeyPair rsaKeyPair = generateKeyPair("RSA", 2048);
-        String rsaOpenSSLKey = convertToOpenSSLFormat(rsaKeyPair.getPrivate());
-        System.out.println("\nRSA Private Key in OpenSSL Format:\n" + rsaOpenSSLKey);
+        
+        // PKCS#1 format (traditional OpenSSL format)
+        System.out.println("RSA Private Key in PKCS#1 Format:");
+        String rsaPKCS1Key = convertToPKCS1Format(rsaKeyPair.getPrivate());
+        System.out.println(rsaPKCS1Key);
+        
+        // PKCS#8 format (unencrypted)
+        System.out.println("\nRSA Private Key in PKCS#8 Format:");
+        String rsaPKCS8Key = convertToPKCS8Format(rsaKeyPair.getPrivate());
+        System.out.println(rsaPKCS8Key);
+        
+        // Public key
+        System.out.println("\nRSA Public Key:");
+        String rsaPublicKey = convertPublicKeyToPEM(rsaKeyPair.getPublic());
+        System.out.println(rsaPublicKey);
     }
 }
