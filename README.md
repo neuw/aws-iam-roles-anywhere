@@ -38,7 +38,7 @@ The core:-
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>0.4.5.1</version>
+    <version>0.5</version>
 </dependency>
 ```
 
@@ -48,7 +48,7 @@ The Starter:-
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
-    <version>0.4.5.1</version>
+    <version>0.5</version>
 </dependency>
 ```
 
