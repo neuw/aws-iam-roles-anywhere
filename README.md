@@ -69,5 +69,6 @@ The Starter:-
 | 0.4.5                 | 0.4.5           |      2.31.50       |        3.5.0        |                                                                            |
 | 0.4.5.1               | 0.4.5.1         |      2.31.50       |        3.5.0        |             Minor change related to Validations of properties              |
 | 0.5                   | 0.5             |      2.31.63       |        3.5.0        | Support for the PKCS8 along with PKCS1, changed AWS SDK version to 2.31.63 |
+| 0.5.1                 | 0.5.1           |      2.31.65       |        3.5.1        |               AWS SDK version to 2.31.65 & Spring Boot 3.5.1               |
 
 
