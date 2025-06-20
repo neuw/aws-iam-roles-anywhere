@@ -30,6 +30,12 @@ Refer the [repository](https://github.com/krnbr/roles-anywhere-openssl) for the 
 
 ➬ In future iterations, can try to include PKCS8 as well, but not supported yet! 
 
+### Project Structure
+
+- Core - The core logic sits here.
+- Starter - The Spring boot custom starter code is here.
+- Tests - The tests for the complete repo are placed in here. run `mvn clean verify` at root of repo!
+
 ### ➬ The initial BETA version has been made available over maven here:-
 
 The core:-
