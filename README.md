@@ -58,7 +58,7 @@ The Starter:-
 </dependency>
 ```
 
-### Versions
+### Refer details of the Versions below, relative versions of the spring boot and AWS SDK also listed
 
 | Parent / Core Version | Starter Version | AWS SDK v2 Version | Spring Boot Version |                                   Notes                                    |
 |-----------------------|-----------------|:------------------:|:-------------------:|:--------------------------------------------------------------------------:|
@@ -71,5 +71,6 @@ The Starter:-
 | 0.5                   | 0.5             |      2.31.63       |        3.5.0        | Support for the PKCS8 along with PKCS1, changed AWS SDK version to 2.31.63 |
 | 0.5.1                 | 0.5.1           |      2.31.65       |        3.5.1        |               AWS SDK version to 2.31.65 & Spring Boot 3.5.1               |
 | 0.5.2                 | 0.5.2           |      2.31.66       |        3.5.2        |               AWS SDK version to 2.31.66 & Spring Boot 3.5.2               |
+| 0.5.3                 | 0.5.3           |      2.31.68       |        3.5.3        |               AWS SDK version to 2.31.68 & Spring Boot 3.5.3               |
 
 
