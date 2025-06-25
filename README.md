@@ -1,76 +1,195 @@
-### AWS roles anywhere Credential Helper(100% programmatic)
+# AWS IAM Roles Anywhere Credential Helper
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=neuw_aws-iam-roles-anywhere&metric=alert_status&token=c504fc27486350af3da99abb8f023932fe4caab3)](https://sonarcloud.io/summary/new_code?id=neuw_aws-iam-roles-anywhere)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=neuw_aws-iam-roles-anywhere&metric=reliability_rating&token=c504fc27486350af3da99abb8f023932fe4caab3)](https://sonarcloud.io/summary/new_code?id=neuw_aws-iam-roles-anywhere)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=neuw_aws-iam-roles-anywhere&metric=sqale_rating&token=c504fc27486350af3da99abb8f023932fe4caab3)](https://sonarcloud.io/summary/new_code?id=neuw_aws-iam-roles-anywhere)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=neuw_aws-iam-roles-anywhere&metric=coverage&token=c504fc27486350af3da99abb8f023932fe4caab3)](https://sonarcloud.io/summary/new_code?id=neuw_aws-iam-roles-anywhere)
 
-AWS roles anywhere is a great IAM service that was launched in July 2022.
+A pure Java library for AWS IAM Roles Anywhere credential provisioning, eliminating the need for external credential helper tools.
 
-AWS provides a [tool](https://github.com/aws/rolesanywhere-credential-helper) to fetch temporary credentials by providing the certificate and key.
+## Overview
 
-That tool is great, but needs extra config for an application to rely on an external tool.
-That tool cannot be shipped along with the code.
+AWS IAM Roles Anywhere allows workloads outside of AWS to obtain temporary AWS credentials using X.509 certificates. While AWS provides an [official credential helper tool](https://github.com/aws/rolesanywhere-credential-helper), this library offers several advantages:
 
-This library removes the requirement of that external utility/ tool to load temporary credentials.
+- **Zero Dependencies**: No external tools required - everything is embedded in your Java application
+- **Native Integration**: Works seamlessly with AWS SDK v2 credential providers
+- **Spring Boot Support**: Auto-configuration for Spring Boot applications
+- **Production Ready**: Comprehensive test coverage and async credential refresh support
 
-The Structure of the library is quite straight forward: -
+## Key Features
 
-➬ A parent pom! Maintains the common most versions of libraries.
+- ✅ Support for both PKCS#1 and PKCS#8 private key formats
+- ✅ X.509 certificate chain validation
+- ✅ Automatic credential refresh with async support
+- ✅ Spring Boot starter with auto-configuration
+- ✅ Built on AWS SDK v2 and Apache HTTP Client
+- ✅ Comprehensive test suite with mock AWS server
 
-➬ A core library—based on AWS SDK, and uses APACHE http client for http call.
+## Quick Start
 
-➬ A Spring Boot starter library that provides AutoConfiguration and uses core library underneath.
+### Maven Dependencies
 
-### ➬ Important Instructions for the setting-up certificates, encoding file content, etc.
+Add the appropriate dependency to your `pom.xml`:
 
-Refer the [repository](https://github.com/krnbr/roles-anywhere-openssl) for the generation of the ca, certificates, etc.
-
-➬ The code only supports the PKCS1 format as of today!
-
-➬ In future iterations, can try to include PKCS8 as well, but not supported yet! 
-
-### Project Structure
-
-- Core - The core logic sits here.
-- Starter - The Spring boot custom starter code is here.
-- Tests - The tests for the complete repo are placed in here. run `mvn clean verify` at root of repo!
-
-### ➬ The initial BETA version has been made available over maven here:-
-
-The core:-
-
-```
+**Core Library (for standalone usage):**
+```xml
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>0.5</version>
+    <version>0.5.3</version>
 </dependency>
 ```
 
-The Starter:-
-
-```
+**Spring Boot Starter (recommended for Spring Boot apps):**
+```xml
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
-    <version>0.5</version>
+    <version>0.5.3</version>
 </dependency>
 ```
 
-### Refer details of the Versions below, relative versions of the spring boot and AWS SDK also listed
+### Basic Usage
 
-| Parent / Core Version | Starter Version | AWS SDK v2 Version | Spring Boot Version |                                   Notes                                    |
-|-----------------------|-----------------|:------------------:|:-------------------:|:--------------------------------------------------------------------------:|
-| 0.4.1                 | 0.4.1           |       2.31.9       |        3.4.3        |                                                                            |
-| 0.4.2                 | 0.4.2           |      2.31.21       |        3.4.4        |                                                                            |
-| 0.4.3                 | 0.4.3           |      2.31.29       |        3.4.5        |                                                                            |
-| 0.4.4                 | 0.4.4           |      2.31.50       |        3.4.6        |                                                                            |
-| 0.4.5                 | 0.4.5           |      2.31.50       |        3.5.0        |                                                                            |
-| 0.4.5.1               | 0.4.5.1         |      2.31.50       |        3.5.0        |             Minor change related to Validations of properties              |
-| 0.5                   | 0.5             |      2.31.63       |        3.5.0        | Support for the PKCS8 along with PKCS1, changed AWS SDK version to 2.31.63 |
-| 0.5.1                 | 0.5.1           |      2.31.65       |        3.5.1        |               AWS SDK version to 2.31.65 & Spring Boot 3.5.1               |
-| 0.5.2                 | 0.5.2           |      2.31.66       |        3.5.2        |               AWS SDK version to 2.31.66 & Spring Boot 3.5.2               |
-| 0.5.3                 | 0.5.3           |      2.31.68       |        3.5.3        |               AWS SDK version to 2.31.68 & Spring Boot 3.5.3               |
+#### Using the Core Library
+
+```java
+import com.fasterxml.jackson.databind.ObjectMapper;
+import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
+import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
+import software.amazon.awssdk.services.s3.S3Client;
+
+// Configure properties
+AwsRolesAnywhereProperties properties = new AwsRolesAnywhereProperties();
+properties.setRoleArn("arn:aws:iam::123456789012:role/MyRole");
+properties.setProfileArn("arn:aws:rolesanywhere:us-east-1:123456789012:profile/uuid");
+properties.setTrustAnchorArn("arn:aws:rolesanywhere:us-east-1:123456789012:trust-anchor/uuid");
+properties.setRegion("us-east-1");
+properties.setDurationSeconds(3600);
+properties.setEncodedX509Certificate("BASE64_ENCODED_CERTIFICATE");
+properties.setEncodedPrivateKey("BASE64_ENCODED_PRIVATE_KEY");
+
+// Create credentials provider using builder
+IAMRolesAnywhereSessionsCredentialsProvider credentialsProvider = 
+    new IAMRolesAnywhereSessionsCredentialsProvider.Builder(properties, new ObjectMapper())
+        .prefetch(true)
+        .asyncCredentialUpdateEnabled(false)
+        .build();
+
+// Use with AWS SDK
+S3Client s3Client = S3Client.builder()
+    .credentialsProvider(credentialsProvider)
+    .build();
+```
+
+#### Using the Spring Boot Starter
+
+**application.yml:**
+```yaml
+aws:
+  iam:
+    rolesanywhere:
+      region: us-east-1
+      role-arn: arn:aws:iam::123456789012:role/MyRole
+      profile-arn: arn:aws:rolesanywhere:us-east-1:123456789012:profile/uuid
+      trust-anchor-arn: arn:aws:rolesanywhere:us-east-1:123456789012:trust-anchor/uuid
+      encoded-x509-certificate: BASE64_ENCODED_CERTIFICATE
+      encoded-private-key: BASE64_ENCODED_PRIVATE_KEY
+      duration-seconds: 3600
+      prefetch: true
+      async-credential-update-enabled: true
+```
+
+**Java Configuration:**
+```java
+@Configuration
+public class AwsConfig {
+    
+    @Bean
+    public S3Client s3Client(AwsCredentialsProvider credentialsProvider) {
+        return S3Client.builder()
+            .credentialsProvider(credentialsProvider)
+            .build();
+    }
+}
+```
+
+## Configuration Reference
+
+### Required Properties
+
+| Property | Description | Example |
+|----------|-------------|---------|
+| `roleArn` | ARN of the IAM role to assume | `arn:aws:iam::123456789012:role/MyRole` |
+| `profileArn` | ARN of the Roles Anywhere profile | `arn:aws:rolesanywhere:us-east-1:123456789012:profile/uuid` |
+| `trustAnchorArn` | ARN of the trust anchor | `arn:aws:rolesanywhere:us-east-1:123456789012:trust-anchor/uuid` |
+| `region` | AWS region | `us-east-1` |
+| `encodedX509Certificate` | Base64 encoded X.509 certificate | `LS0tLS1CRUdJTi...` |
+| `encodedPrivateKey` | Base64 encoded private key (PKCS#1 or PKCS#8) | `LS0tLS1CRUdJTi...` |
+
+### Optional Properties
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `durationSeconds` | `3600` | Credential validity duration (900-3600 seconds) |
+| `roleSessionName` | `null` | Custom session name for the assumed role |
+| `prefetch` | `true` | Enable credential pre-fetching |
+| `asyncCredentialUpdateEnabled` | `false` | Enable asynchronous credential refresh |
+
+## Certificate Setup
+
+For certificate generation and setup, refer to the [roles-anywhere-openssl repository](https://github.com/krnbr/roles-anywhere-openssl).
+
+### Supported Formats
+
+- **Private Keys**: PKCS#1 (`-----BEGIN RSA PRIVATE KEY-----`) and PKCS#8 (`-----BEGIN PRIVATE KEY-----`)
+- **Certificates**: X.509 PEM format (`-----BEGIN CERTIFICATE-----`)
+- **Certificate Chains**: Multiple certificates concatenated in PEM format
+
+## Project Structure
+
+- **`core/`** - Core credential provider implementation
+- **`starter/`** - Spring Boot auto-configuration
+- **`tests/`** - Comprehensive test suite
+
+Run tests with: `mvn clean verify`
+
+## Troubleshooting
+
+### Common Issues
+
+**Certificate/Key Format Errors**
+- Ensure certificates are in PEM format with proper headers (`-----BEGIN CERTIFICATE-----`)
+- Verify private keys are either PKCS#1 (`-----BEGIN RSA PRIVATE KEY-----`) or PKCS#8 (`-----BEGIN PRIVATE KEY-----`)
+- Check that Base64 encoding doesn't include line breaks or whitespace
+
+**Credential Refresh Issues**
+- Enable async credential refresh for long-running applications
+- Verify network connectivity to AWS Roles Anywhere endpoints
+- Check IAM role trust relationships and policies
+
+**Spring Boot Integration**
+- Ensure properties are correctly prefixed with `aws.iam.rolesanywhere`
+- Verify auto-configuration is not excluded
+
+## Version History
+
+| Version | AWS SDK v2 | Spring Boot | Notes |
+|---------|------------|-------------|-------|
+| 0.5.3   | 2.31.68    | 3.5.3       | Latest stable release |
+| 0.5.2   | 2.31.66    | 3.5.2       | Bug fixes and dependency updates |
+| 0.5.1   | 2.31.65    | 3.5.1       | Performance improvements |
+| 0.5     | 2.31.63    | 3.5.0       | **PKCS#8 support added** |
+| 0.4.5.1 | 2.31.50    | 3.5.0       | Property validation enhancements |
+| 0.4.5   | 2.31.50    | 3.5.0       | Spring Boot 3.5.0 support |
+| 0.4.4   | 2.31.50    | 3.4.6       | Stability improvements |
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
 
 
