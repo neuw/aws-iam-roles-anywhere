@@ -4,46 +4,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
-import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
 import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.services.iam.model.IamException;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.core.exception.SdkException;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.NoSuchProviderException;
+import java.security.Security;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.Base64;
 
-import static in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper.SESSIONS_URI;
+import static in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader.BEGIN_CERT;
 import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.convertToPEM;
 import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.generateCertificateChainText;
 import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil.convertToOpenSSLFormat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
-class CoreNegativeTests {
+class CoreNegativeV2Tests {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static MockedStatic<AwsX509SigningHelper> awsX509SigningHelperMockedStatic;
-    private static MockedStatic<IoUtils> ioUtilsMockedStatic;
-    private static MockedStatic<MessageDigest> messageDigestMockedStatic;
-
-    static {
-        // Initialize mock before Spring context
-        awsX509SigningHelperMockedStatic = mockStatic(AwsX509SigningHelper.class, CALLS_REAL_METHODS);
-        ioUtilsMockedStatic = mockStatic(IoUtils.class, CALLS_REAL_METHODS);
-        messageDigestMockedStatic = mockStatic(MessageDigest.class, CALLS_REAL_METHODS);
-    }
+    private static MockedStatic<CertificateFactory> certificateFactoryMockedStatic;
 
     @BeforeAll
     static void init() {
@@ -51,28 +40,32 @@ class CoreNegativeTests {
         MockAwsServer.init();
     }
 
+    @BeforeEach
+    void initEveryTime() {
+        certificateFactoryMockedStatic = mockStatic(CertificateFactory.class, CALLS_REAL_METHODS);
+    }
+
+    @AfterEach
+    void cleanup() {
+        if (certificateFactoryMockedStatic != null) {
+            certificateFactoryMockedStatic.close();
+            certificateFactoryMockedStatic = null;
+        }
+    }
+
     @AfterAll
-    static void cleanup() {
+    static void tearDown() {
         MockAwsServer.stopInstance();
-        awsX509SigningHelperMockedStatic.close();
-        awsX509SigningHelperMockedStatic = null;
-        ioUtilsMockedStatic.close();
-        ioUtilsMockedStatic = null;
-        messageDigestMockedStatic.close();
-        messageDigestMockedStatic = null;
     }
 
     @Test
-    void emptyResponseErrorTest() throws Exception {
-        awsX509SigningHelperMockedStatic.close();
-        awsX509SigningHelperMockedStatic = null;
-        awsX509SigningHelperMockedStatic = mockStatic(AwsX509SigningHelper.class, CALLS_REAL_METHODS);
-        awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.resolveUri(any()))
-                .thenReturn("http://localhost:8090" + SESSIONS_URI + "-empty-response");
-
+    void noSuchProviderExceptionErrorTest() throws Exception {
         var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
+
+        certificateFactoryMockedStatic.when(() -> CertificateFactory.getInstance("X.509", "BC"))
+                .thenThrow(new NoSuchProviderException("BC provider not found"));
 
         System.out.println(convertToPEM(ecKeyPair.getPrivate()));
         System.out.println("ecCertChain "+ecCertChain);
@@ -89,24 +82,79 @@ class CoreNegativeTests {
         properties.setDurationSeconds(3600);
         properties.setAsyncCredentialUpdateEnabled(true);
 
-        assertThrows(IamException.class, () -> {
+        assertThrows(NoSuchProviderException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(properties, objectMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
         });
-        awsX509SigningHelperMockedStatic.verify(() -> AwsX509SigningHelper.resolveUri(any()), atLeastOnce());
     }
 
     @Test
-    void keyNoSuchAlgorithmExceptionTest() throws Exception {
-        awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.sign(any(), any()))
-                .thenThrow(new NoSuchAlgorithmException("test"));
+    void certNotGoodTest() throws Exception {
+        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
 
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
+        System.out.println("ecKeyBase64 "+ecKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(ecKeyBase64);
+        properties.setEncodedX509Certificate(Base64.getEncoder().encodeToString("test".getBytes(StandardCharsets.UTF_8)));
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        assertThrows(SdkException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(properties, objectMapper)
+                    .prefetch(properties.getPrefetch())
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void certNotGoodV2Test() throws Exception {
+        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
+        System.out.println("ecKeyBase64 "+ecKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(ecKeyBase64);
+        properties.setEncodedX509Certificate(Base64.getEncoder().encodeToString((BEGIN_CERT+"test").getBytes(StandardCharsets.UTF_8)));
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        assertThrows(SdkException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(properties, objectMapper)
+                    .prefetch(properties.getPrefetch())
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+    }
+
+    @Test
+    void certificateExceptionErrorTest() throws Exception {
         var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
+
+        certificateFactoryMockedStatic.when(() -> CertificateFactory.getInstance("X.509", "BC"))
+                .thenThrow(new CertificateException("test dummy!!"));
 
         System.out.println(convertToPEM(ecKeyPair.getPrivate()));
         System.out.println("ecCertChain "+ecCertChain);
@@ -123,120 +171,13 @@ class CoreNegativeTests {
         properties.setDurationSeconds(3600);
         properties.setAsyncCredentialUpdateEnabled(true);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(CertificateException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(properties, objectMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
         });
-
-        awsX509SigningHelperMockedStatic.verify(() -> AwsX509SigningHelper.resolveUri(any()), atLeastOnce());
-    }
-
-    @Test
-    void keySignatureExceptionTest() throws Exception {
-        awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.sign(any(), any()))
-                .thenThrow(new SignatureException("test"));
-
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
-        var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-        System.out.println("ecCertChain "+ecCertChain);
-        System.out.println("ecKeyBase64 "+ecKeyBase64);
-
-        var properties = new AwsRolesAnywhereProperties();
-        properties.setEncodedPrivateKey(ecKeyBase64);
-        properties.setEncodedX509Certificate(ecCertChain);
-        properties.setRoleArn("test");
-        properties.setProfileArn("test");
-        properties.setTrustAnchorArn("test");
-        properties.setPrefetch(true);
-        properties.setRegion("ap-south-1");
-        properties.setDurationSeconds(3600);
-        properties.setAsyncCredentialUpdateEnabled(true);
-
-        assertThrows(RuntimeException.class, () -> {
-            new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
-                    .prefetch(properties.getPrefetch())
-                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
-                    .build();
-        });
-
-        awsX509SigningHelperMockedStatic.verify(() -> AwsX509SigningHelper.resolveUri(any()), atLeastOnce());
-    }
-
-    @Test
-    void keyInvalidKeyExceptionTest() throws Exception {
-        awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.sign(any(), any()))
-                .thenThrow(new InvalidKeyException("test"));
-
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
-        var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-        System.out.println("ecCertChain "+ecCertChain);
-        System.out.println("ecKeyBase64 "+ecKeyBase64);
-
-        var properties = new AwsRolesAnywhereProperties();
-        properties.setEncodedPrivateKey(ecKeyBase64);
-        properties.setEncodedX509Certificate(ecCertChain);
-        properties.setRoleArn("test");
-        properties.setProfileArn("test");
-        properties.setTrustAnchorArn("test");
-        properties.setPrefetch(true);
-        properties.setRegion("ap-south-1");
-        properties.setDurationSeconds(3600);
-        properties.setAsyncCredentialUpdateEnabled(true);
-
-        assertThrows(RuntimeException.class, () -> {
-            new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
-                    .prefetch(properties.getPrefetch())
-                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
-                    .build();
-        });
-
-        awsX509SigningHelperMockedStatic.verify(() -> AwsX509SigningHelper.resolveUri(any()), atLeastOnce());
-    }
-
-    @Test
-    void ioUtilsExceptionTest() throws Exception {
-        ioUtilsMockedStatic.when(() -> IoUtils.toUtf8String(any()))
-                .thenThrow(new IOException("test"));
-
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
-        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
-        var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
-
-        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
-        System.out.println("ecCertChain "+ecCertChain);
-        System.out.println("ecKeyBase64 "+ecKeyBase64);
-
-        var properties = new AwsRolesAnywhereProperties();
-        properties.setEncodedPrivateKey(ecKeyBase64);
-        properties.setEncodedX509Certificate(ecCertChain);
-        properties.setRoleArn("test");
-        properties.setProfileArn("test");
-        properties.setTrustAnchorArn("test");
-        properties.setPrefetch(true);
-        properties.setRegion("ap-south-1");
-        properties.setDurationSeconds(3600);
-        properties.setAsyncCredentialUpdateEnabled(true);
-
-        assertThrows(RuntimeException.class, () -> {
-            new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
-                    .prefetch(properties.getPrefetch())
-                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
-                    .build();
-        });
-
-        awsX509SigningHelperMockedStatic.verify(() -> AwsX509SigningHelper.resolveUri(any()), atLeastOnce());
     }
 
 }

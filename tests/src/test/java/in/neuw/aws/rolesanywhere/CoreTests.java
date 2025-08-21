@@ -282,7 +282,7 @@ class CoreTests {
         properties.setPrefetch(true);
         properties.setRegion("ap-south-1");
         properties.setDurationSeconds(3600);
-        properties.setAsyncCredentialUpdateEnabled(true);
+        properties.setAsyncCredentialUpdateEnabled(false);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
                 .Builder(properties, objectMapper)
