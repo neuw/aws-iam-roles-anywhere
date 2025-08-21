@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformerV2;
+import com.github.tomakehurst.wiremock.http.HttpHeader;
+import com.github.tomakehurst.wiremock.http.HttpHeaders;
 import com.github.tomakehurst.wiremock.http.Response;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,10 @@ public class MockAwsServer {
 
     public static void stopInstance() {
         instance.stop();
+    }
+
+    public static void main(String[] args) {
+        init();
     }
 
     public static void init() {
@@ -54,7 +60,7 @@ public class MockAwsServer {
         instance.stubFor(post(urlPathEqualTo(SESSIONS_URI+"-empty-response"))
                 .willReturn(
                         aResponse()
-                                .withStatus(201)
+                                .withStatus(204)
                                 .withTransformers("aws-rolesanywhere-mock-empty-response"))
         );
 
@@ -123,8 +129,10 @@ public class MockAwsServer {
     public static class AWSRolesAnywhereMockTransformerNoBody implements ResponseTransformerV2 {
         @Override
         public Response transform(Response response, ServeEvent serveEvent) {
-            System.out.println("request body received = "+serveEvent.getRequest().getBodyAsString());
-            return Response.Builder.like(response)
+            System.out.println("request body received mocked empty response = "+serveEvent.getRequest().getBodyAsString());
+            return Response.Builder
+                    .like(response)
+                    .headers(new HttpHeaders().plus(new HttpHeader("Connection", "Close")))
                     .build();
         }
 

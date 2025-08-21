@@ -85,7 +85,7 @@ public class KeyPairGeneratorUtilV2 {
     }
 
     // PKCS#8 format methods (new)
-    public static String convertToPKCS8Format(PrivateKey privateKey) throws Exception {
+    public static String convertToPKCS8Format(PrivateKey privateKey) {
         // PKCS#8 is the default format that Java uses - privateKey.getEncoded() returns PKCS#8 DER
         byte[] pkcs8Encoded = privateKey.getEncoded();
         String base64Encoded = Base64.getEncoder().encodeToString(pkcs8Encoded);
@@ -94,7 +94,7 @@ public class KeyPairGeneratorUtilV2 {
     }
 
     // Public key methods
-    public static String convertPublicKeyToPEM(PublicKey publicKey) throws Exception {
+    public static String convertPublicKeyToPEM(PublicKey publicKey) {
         byte[] encoded = publicKey.getEncoded();
         String base64Encoded = Base64.getEncoder().encodeToString(encoded);
         

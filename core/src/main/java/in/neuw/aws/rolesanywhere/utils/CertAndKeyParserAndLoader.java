@@ -8,6 +8,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.utils.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -39,7 +40,7 @@ public class CertAndKeyParserAndLoader {
     public static final String SHA256_RSA = "SHA256withRSA";
     public static final String SHA256_EC_DSA = "SHA256withECDSA";
 
-    public static X509Certificate extractCertificate(final String base64EncodedCert){
+    public static X509Certificate extractCertificate(final String base64EncodedCert) {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             byte[] decodedCertificate = Base64.getDecoder().decode(base64EncodedCert);
@@ -48,7 +49,7 @@ public class CertAndKeyParserAndLoader {
             return cert;
         } catch (CertificateException e) {
             log.error("Error while extracting certificate, {}", e.getMessage());
-            throw new RuntimeException(e);
+            throw SdkException.builder().message("Error while extracting certificate").cause(e).build();
         }
     }
 
@@ -74,7 +75,7 @@ public class CertAndKeyParserAndLoader {
             return true;
         } else {
             log.error("cert not provided correctly");
-            throw new RuntimeException("cert not provided correctly");
+            throw SdkException.builder().message("cert not provided correctly").build();
         }
         return false;
     }
@@ -109,17 +110,17 @@ public class CertAndKeyParserAndLoader {
         try (JcaPEMWriter pw = new JcaPEMWriter(sw)) {
             pw.writeObject(x509Cert);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw SdkException.builder().cause(e).build();
         }
         return Base64.getEncoder().encodeToString(sw.toString().getBytes(StandardCharsets.UTF_8));
     }
 
-    public static final PrivateKey extractPrivateKey(final String base64EncodedPrivateKey) {
+    public static PrivateKey extractPrivateKey(final String base64EncodedPrivateKey) {
         var privateKeyBytes = Base64.getDecoder().decode(base64EncodedPrivateKey);
         try {
             return privateKeyResolver(privateKeyBytes);
         } catch (InvalidKeySpecException | IOException | NoSuchAlgorithmException | NoSuchProviderException e) {
-            throw new RuntimeException(e);
+            throw SdkException.builder().cause(e).build();
         }
     }
 
@@ -150,7 +151,7 @@ public class CertAndKeyParserAndLoader {
             log.info("The key is an EC private key.");
             keyType = EC;
         } else {
-            throw new RuntimeException("Unsupported key algorithm: " + algorithm);
+            throw new IllegalArgumentException("Unsupported key algorithm: " + algorithm);
         }
         return keyType;
     }
@@ -215,7 +216,7 @@ public class CertAndKeyParserAndLoader {
 
     private static int countOccurrencesOfBEGINCERT(final String str) {
         // if main string or subString is empty, makes no sense of occurrence, hence hard stopped with 0 occurrence
-        if (StringUtils.isBlank(str) || StringUtils.isBlank(BEGIN_CERT)) {
+        if (StringUtils.isBlank(str)) {
             return 0;
         }
 

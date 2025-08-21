@@ -12,6 +12,7 @@ import software.amazon.awssdk.http.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.ServiceEndpointKey;
 import software.amazon.awssdk.regions.servicemetadata.RolesanywhereServiceMetadata;
+import software.amazon.awssdk.services.iam.model.IamException;
 import software.amazon.awssdk.utils.BinaryUtils;
 import software.amazon.awssdk.utils.IoUtils;
 
@@ -41,6 +42,7 @@ public class AwsX509SigningHelper {
 
     private AwsX509SigningHelper() {}
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC);
     private static final String LINE_SEPARATOR = "\n";
     private static final String SEMI_COLON = ";";
@@ -66,7 +68,8 @@ public class AwsX509SigningHelper {
         return getDateAndTime(instant).substring(0, 8);
     }
 
-    public static byte[] hash(final String text) throws NoSuchAlgorithmException {
+    @SneakyThrows
+    public static byte[] hash(final String text) {
         var digest = MessageDigest.getInstance(SHA_256);
         return digest.digest(text.getBytes(StandardCharsets.UTF_8));
     }
@@ -84,7 +87,7 @@ public class AwsX509SigningHelper {
                                           final String method,
                                           final String uri,
                                           final String body,
-                                          final X509CertificateChain x509CertificateChain) throws NoSuchAlgorithmException, CertificateException, NoSuchProviderException {
+                                          final X509CertificateChain x509CertificateChain) throws NoSuchAlgorithmException, CertificateException {
         var dateAndTime = getDateAndTime(instant);
         var canonicalHeaders = "";
         var canonicalRequestBuilder = new StringBuilder();
@@ -120,7 +123,7 @@ public class AwsX509SigningHelper {
         return canonicalRequestBuilder.toString();
     }
 
-    public static String hashContent(final String canonicalRequest) throws NoSuchAlgorithmException {
+    public static String hashContent(final String canonicalRequest) {
         return BinaryUtils.toHex(hash(canonicalRequest));
     }
 
@@ -180,7 +183,7 @@ public class AwsX509SigningHelper {
     public static String contentToSign(final Instant instant,
                                        final Region region,
                                        final String algorithm,
-                                       final String canonicalRequest) throws IOException, NoSuchAlgorithmException {
+                                       final String canonicalRequest) {
         log.debug("canonicalRequest: \n{}", canonicalRequest);
         return algorithm + '\n' +
                 getDateAndTime(instant) + '\n' +
@@ -189,7 +192,7 @@ public class AwsX509SigningHelper {
     }
 
     public static String sign(final String contentToSign,
-                              final PrivateKey key) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+                              final PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         var signature = Signature.getInstance(resolveSignatureAlgorithm(key));
         signature.initSign(key);
 
@@ -254,20 +257,25 @@ public class AwsX509SigningHelper {
 
             // Read and print response body
             return getAwsRolesAnywhereSessionsResponse(om, requestSpec);
-        } catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | CertificateException e) {
-            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException | IOException | CertificateException | NoSuchProviderException |
+                 SignatureException | InvalidKeyException | IamException e) {
+            throw IamException.builder()
+                    .message("Error while trying to connect to AWS ROLES ANYWHERE")
+                    .build();
         }
     }
 
-    @SneakyThrows
-    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(ObjectMapper om, HttpExecuteResponse requestSpec) {
-        if (requestSpec.responseBody().isPresent()) {
+    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(ObjectMapper om, HttpExecuteResponse requestSpec) throws IOException {
+        if (requestSpec.httpResponse().statusCode() == 201 && requestSpec.responseBody().isPresent()) {
             var content = requestSpec.responseBody().get();
             var responseBody = IoUtils.toUtf8String(content);
-            log.debug("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
+            log.info("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
             return om.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
         } else {
-            throw new RuntimeException("Response body is empty");
+            log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
+            throw IamException.builder()
+                    .message("failed response for the AWS ROLES ANYWHERE SESSION endpoint")
+                    .build();
         }
     }
 
@@ -275,15 +283,14 @@ public class AwsX509SigningHelper {
         return resolveHostEndpoint(region) + SESSIONS_URI;
     }
 
-    @SneakyThrows
     private static HttpExecuteResponse executeHttpRequest(final Instant instant,
                                                           final AwsRolesAnywhereSessionsRequest sessionsRequest,
                                                           final SdkHttpClient sdkHttpClient,
                                                           final AwsRolesAnyWhereRequesterDetails requesterDetails,
                                                           final String contentToSign,
-                                                          final String signingAlgorithm) {
+                                                          final String signingAlgorithm) throws IOException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
 
-        String jsonBody = new ObjectMapper().writeValueAsString(sessionsRequest);
+        String jsonBody = OBJECT_MAPPER.writeValueAsString(sessionsRequest);
         InputStream requestBodyStream = new ByteArrayInputStream(jsonBody.getBytes(StandardCharsets.UTF_8));
 
         var awsRegion = requesterDetails.getRegion();
