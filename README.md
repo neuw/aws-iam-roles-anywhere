@@ -36,7 +36,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>0.5.5</version>
+    <version>0.5.6</version>
 </dependency>
 ```
 
@@ -45,7 +45,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
-    <version>0.5.5</version>
+    <version>0.5.6</version>
 </dependency>
 ```
 
@@ -118,23 +118,23 @@ public class AwsConfig {
 
 ### Required Properties
 
-| Property | Description | Example |
-|----------|-------------|---------|
-| `roleArn` | ARN of the IAM role to assume | `arn:aws:iam::123456789012:role/MyRole` |
-| `profileArn` | ARN of the Roles Anywhere profile | `arn:aws:rolesanywhere:us-east-1:123456789012:profile/uuid` |
-| `trustAnchorArn` | ARN of the trust anchor | `arn:aws:rolesanywhere:us-east-1:123456789012:trust-anchor/uuid` |
-| `region` | AWS region | `us-east-1` |
-| `encodedX509Certificate` | Base64 encoded X.509 certificate | `LS0tLS1CRUdJTi...` |
-| `encodedPrivateKey` | Base64 encoded private key (PKCS#1 or PKCS#8) | `LS0tLS1CRUdJTi...` |
+| Property                 | Description                                   | Example                                                          |
+|--------------------------|-----------------------------------------------|------------------------------------------------------------------|
+| `roleArn`                | ARN of the IAM role to assume                 | `arn:aws:iam::123456789012:role/MyRole`                          |
+| `profileArn`             | ARN of the Roles Anywhere profile             | `arn:aws:rolesanywhere:us-east-1:123456789012:profile/uuid`      |
+| `trustAnchorArn`         | ARN of the trust anchor                       | `arn:aws:rolesanywhere:us-east-1:123456789012:trust-anchor/uuid` |
+| `region`                 | AWS region                                    | `us-east-1`                                                      |
+| `encodedX509Certificate` | Base64 encoded X.509 certificate              | `LS0tLS1CRUdJTi...`                                              |
+| `encodedPrivateKey`      | Base64 encoded private key (PKCS#1 or PKCS#8) | `LS0tLS1CRUdJTi...`                                              |
 
 ### Optional Properties
 
-| Property | Default | Description |
-|----------|---------|-------------|
-| `durationSeconds` | `3600` | Credential validity duration (900-3600 seconds) |
-| `roleSessionName` | `null` | Custom session name for the assumed role |
-| `prefetch` | `true` | Enable credential pre-fetching |
-| `asyncCredentialUpdateEnabled` | `false` | Enable asynchronous credential refresh |
+| Property                       | Default | Description                                     |
+|--------------------------------|---------|-------------------------------------------------|
+| `durationSeconds`              | `3600`  | Credential validity duration (900-3600 seconds) |
+| `roleSessionName`              | `null`  | Custom session name for the assumed role        |
+| `prefetch`                     | `true`  | Enable credential pre-fetching                  |
+| `asyncCredentialUpdateEnabled` | `false` | Enable asynchronous credential refresh          |
 
 ## Certificate Setup
 
@@ -174,17 +174,18 @@ Run tests with: `mvn clean verify`
 
 ## Version History
 
-| Version | AWS SDK v2 | Spring Boot | Notes                            |
-|---------|------------|-------------|----------------------------------|
-| 0.5.5   | 2.32.27    | 3.5.5       | Latest stable release            |
-| 0.5.4   | 2.32.7     | 3.5.4       | No major or minor changes        |
-| 0.5.3   | 2.31.68    | 3.5.3       | No major or minor changes        |
-| 0.5.2   | 2.31.66    | 3.5.2       | Bug fixes and dependency updates |
-| 0.5.1   | 2.31.65    | 3.5.1       | Performance improvements         |
-| 0.5     | 2.31.63    | 3.5.0       | **PKCS#8 support added**         |
-| 0.4.5.1 | 2.31.50    | 3.5.0       | Property validation enhancements |
-| 0.4.5   | 2.31.50    | 3.5.0       | Spring Boot 3.5.0 support        |
-| 0.4.4   | 2.31.50    | 3.4.6       | Stability improvements           |
+| Version | AWS SDK v2 | Spring Boot | Notes                              |
+|---------|------------|-------------|------------------------------------|
+| 0.5.6   | 2.34.0     | 3.5.6       | Latest stable release              |
+| 0.5.5   | 2.32.27    | 3.5.5       | Better Exception Handling features |
+| 0.5.4   | 2.32.7     | 3.5.4       | No major or minor changes          |
+| 0.5.3   | 2.31.68    | 3.5.3       | No major or minor changes          |
+| 0.5.2   | 2.31.66    | 3.5.2       | Bug fixes and dependency updates   |
+| 0.5.1   | 2.31.65    | 3.5.1       | Performance improvements           |
+| 0.5     | 2.31.63    | 3.5.0       | **PKCS#8 support added**           |
+| 0.4.5.1 | 2.31.50    | 3.5.0       | Property validation enhancements   |
+| 0.4.5   | 2.31.50    | 3.5.0       | Spring Boot 3.5.0 support          |
+| 0.4.4   | 2.31.50    | 3.4.6       | Stability improvements             |
 
 ## Contributing
 

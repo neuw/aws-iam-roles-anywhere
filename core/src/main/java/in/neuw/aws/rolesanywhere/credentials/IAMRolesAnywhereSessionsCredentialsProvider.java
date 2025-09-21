@@ -73,6 +73,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
     }
 
     public AwsRolesAnywhereSessionsResponse refreshCredentials() {
+        log.info("re-fetching credentials for 'roles anywhere AWS service'");
         return fetchCredentials(awsRolesAnywhereSessionsRequest, requesterDetails, sdkHttpClient, objectMapper);
     }
 
