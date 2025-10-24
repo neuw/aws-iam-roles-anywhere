@@ -36,7 +36,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>0.5.6</version>
+    <version>0.5.7</version>
 </dependency>
 ```
 
@@ -45,7 +45,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
-    <version>0.5.6</version>
+    <version>0.5.7</version>
 </dependency>
 ```
 
@@ -176,6 +176,7 @@ Run tests with: `mvn clean verify`
 
 | Version | AWS SDK v2 | Spring Boot | Notes                              |
 |---------|------------|-------------|------------------------------------|
+| 0.5.7   | 2.34.0     | 3.5.7       | Latest stable release              |
 | 0.5.6   | 2.34.0     | 3.5.6       | Latest stable release              |
 | 0.5.5   | 2.32.27    | 3.5.5       | Better Exception Handling features |
 | 0.5.4   | 2.32.7     | 3.5.4       | No major or minor changes          |
