@@ -149,7 +149,7 @@ public class CertificateChainGeneratorTestUtil {
         System.out.println("base64EncodedChain:-\n"+base64EncodedChain);
 
         System.out.println("Generated " + algorithm + " certificate chain as Base64 encoded string");
-        return combinedChainPEM;
+        return base64EncodedChain;
     }
 
     public static String generateCertificate(String algorithm, KeyPair keyPair) throws Exception {
