@@ -25,15 +25,13 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
-public class CertificateChainReferencingGenerator {
+public class CertificateChainGeneratorTestUtil {
 
-    // Base URL for where certificates can be downloaded (this would be your actual server in production)
     public static final String CA_REPOSITORY_URL = "http://localhost:8080";
 
     /**
      * Generate a complete certificate chain with the specified algorithm
      *
-     * @return
      */
     public static List<X509Certificate> generateCertificateChain(String algorithm, KeyPair keyPair) throws Exception {
         String prefix = algorithm.toLowerCase();
@@ -142,16 +140,16 @@ public class CertificateChainReferencingGenerator {
                 certificateToPEM(intermediateCACert) +
                 certificateToPEM(rootCACert);
 
-        System.out.println("combinedChainPEM "+combinedChainPEM);
+        System.out.println("combinedChainPEM:-\n"+combinedChainPEM);
 
         // Convert the PEM chain to Base64
         byte[] chainBytes = combinedChainPEM.getBytes(StandardCharsets.UTF_8);
         String base64EncodedChain = Base64.getEncoder().encodeToString(chainBytes);
 
-        System.out.println("base64EncodedChain "+base64EncodedChain);
+        System.out.println("base64EncodedChain:-\n"+base64EncodedChain);
 
         System.out.println("Generated " + algorithm + " certificate chain as Base64 encoded string");
-        return base64EncodedChain;
+        return combinedChainPEM;
     }
 
     public static String generateCertificate(String algorithm, KeyPair keyPair) throws Exception {

@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper.SESSIONS_URI;
-import static in.neuw.aws.rolesanywhere.utils.MockAwsRolesAnywhereSessionsResponseGenerator.mockAwsRolesAnywhereSessionsResponse;
+import static in.neuw.aws.rolesanywhere.utils.MockAwsRolesAnywhereSessionsResponseGeneratorTestUtil.mockAwsRolesAnywhereSessionsResponse;
 
 @Slf4j
 public class MockAwsServer {

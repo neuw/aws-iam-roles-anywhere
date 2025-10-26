@@ -5,7 +5,7 @@ import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentials
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
-import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil;
+import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,9 +22,9 @@ import java.security.*;
 import java.util.Base64;
 
 import static in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper.SESSIONS_URI;
-import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.convertToPEM;
-import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.generateCertificateChainText;
-import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil.convertToOpenSSLFormat;
+import static in.neuw.aws.rolesanywhere.utils.CertificateChainGeneratorTestUtil.convertToPEM;
+import static in.neuw.aws.rolesanywhere.utils.CertificateChainGeneratorTestUtil.generateCertificateChainText;
+import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil.convertToOpenSSLFormat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -70,7 +70,7 @@ class CoreNegativeTests {
         awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.resolveUri(any()))
                 .thenReturn("http://localhost:8090" + SESSIONS_URI + "-empty-response");
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 
@@ -104,7 +104,7 @@ class CoreNegativeTests {
         awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.sign(any(), any()))
                 .thenThrow(new NoSuchAlgorithmException("test"));
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 
@@ -139,7 +139,7 @@ class CoreNegativeTests {
         awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.sign(any(), any()))
                 .thenThrow(new SignatureException("test"));
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 
@@ -174,7 +174,7 @@ class CoreNegativeTests {
         awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.sign(any(), any()))
                 .thenThrow(new InvalidKeyException("test"));
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 
@@ -209,7 +209,7 @@ class CoreNegativeTests {
         ioUtilsMockedStatic.when(() -> IoUtils.toUtf8String(any()))
                 .thenThrow(new IOException("test"));
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 

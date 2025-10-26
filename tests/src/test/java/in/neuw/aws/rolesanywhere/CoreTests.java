@@ -8,8 +8,8 @@ import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
 import in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader;
-import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil;
-import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtilV2;
+import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil;
+import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtilV2;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.AfterAll;
@@ -30,9 +30,9 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 
-import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.*;
-import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil.convertToOpenSSLFormat;
-import static in.neuw.aws.rolesanywhere.utils.MockAwsRolesAnywhereSessionsResponseGenerator.mockAwsRolesAnywhereSessionsResponse;
+import static in.neuw.aws.rolesanywhere.utils.CertificateChainGeneratorTestUtil.*;
+import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil.convertToOpenSSLFormat;
+import static in.neuw.aws.rolesanywhere.utils.MockAwsRolesAnywhereSessionsResponseGeneratorTestUtil.mockAwsRolesAnywhereSessionsResponse;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -83,8 +83,8 @@ class CoreTests {
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
-        var ecKeyPair = KeyPairGeneratorUtilV2.generateKeyPair("EC", "secp384r1");
-        var ecKeyBase64 = Base64.getEncoder().encodeToString(KeyPairGeneratorUtilV2.convertToPKCS8Format(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var ecKeyPair = KeyPairGeneratorTestUtilV2.generateKeyPair("EC", "secp384r1");
+        var ecKeyBase64 = Base64.getEncoder().encodeToString(KeyPairGeneratorTestUtilV2.convertToPKCS8Format(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 
         System.out.println(convertToPEM(ecKeyPair.getPrivate()));
@@ -129,7 +129,7 @@ class CoreTests {
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 
@@ -175,7 +175,7 @@ class CoreTests {
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -220,8 +220,8 @@ class CoreTests {
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
-        var rsaKeyPair = KeyPairGeneratorUtilV2.generateKeyPair("RSA", 2048);
-        var rsaKeyBase64 = Base64.getEncoder().encodeToString(KeyPairGeneratorUtilV2.convertToPKCS8Format(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var rsaKeyPair = KeyPairGeneratorTestUtilV2.generateKeyPair("RSA", 2048);
+        var rsaKeyBase64 = Base64.getEncoder().encodeToString(KeyPairGeneratorTestUtilV2.convertToPKCS8Format(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
         System.out.println("CertChain "+rsaCertChain);
@@ -265,7 +265,7 @@ class CoreTests {
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificate("EC", ecKeyPair);
 
@@ -332,7 +332,7 @@ class CoreTests {
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         // mocked dirty value
         var ecCertChain = Base64.getEncoder().encodeToString("GIBBERISH_NOT_A_CERT_OR_CERT_CHAIN".getBytes(StandardCharsets.UTF_8));
@@ -371,7 +371,7 @@ class CoreTests {
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificate("EC", ecKeyPair); // actual
 
@@ -423,7 +423,7 @@ class CoreTests {
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificate("EC", ecKeyPair); // actual
 
@@ -492,7 +492,7 @@ class CoreTests {
     @Test
     void RSAKeyBasedCertTest() throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificate("RSA", rsaKeyPair);
 
@@ -527,7 +527,7 @@ class CoreTests {
     @Test
     void RSAKeyBasedCertWithChainTest() throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -562,7 +562,7 @@ class CoreTests {
     @Test
     void builderIssuesDurationNotPresentTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -608,7 +608,7 @@ class CoreTests {
     @Test
     void builderIssuesDurationSecondsIncorrectTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -655,7 +655,7 @@ class CoreTests {
     @Test
     void builderIssuesDurationSecondsNotValidTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -702,7 +702,7 @@ class CoreTests {
     @Test
     void builderIssuesRoleArnNotPresentTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -748,7 +748,7 @@ class CoreTests {
     @Test
     void builderIssuesTrustArnNotPresentTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -794,7 +794,7 @@ class CoreTests {
     @Test
     void builderIssuesProfileArnNotPresentTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -840,7 +840,7 @@ class CoreTests {
     @Test
     void builderIssuesPrivateKeyNotPresentTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -886,7 +886,7 @@ class CoreTests {
     @Test
     void builderIssuesCertNotPresentTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 
@@ -932,7 +932,7 @@ class CoreTests {
     @Test
     void builderIssuesRegionNotPresentTest(TestInfo testInfo) throws Exception {
 
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificateChainText("RSA", rsaKeyPair);
 

@@ -4,7 +4,7 @@ import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentials
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.mocks.TestApplication;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
-import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil;
+import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -22,8 +22,8 @@ import software.amazon.awssdk.regions.Region;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.generateCertificate;
-import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil.convertToOpenSSLFormat;
+import static in.neuw.aws.rolesanywhere.utils.CertificateChainGeneratorTestUtil.generateCertificate;
+import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil.convertToOpenSSLFormat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -81,7 +81,7 @@ class RSABasedStarterTests {
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) throws Exception {
         // Generate test data before context startup
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var rsaKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(rsaKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var rsaCertChain = generateCertificate("RSA", rsaKeyPair);
 

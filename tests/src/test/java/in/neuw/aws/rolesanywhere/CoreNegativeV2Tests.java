@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
-import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil;
+import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +20,9 @@ import java.security.cert.CertificateFactory;
 import java.util.Base64;
 
 import static in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader.BEGIN_CERT;
-import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.convertToPEM;
-import static in.neuw.aws.rolesanywhere.utils.CertificateChainReferencingGenerator.generateCertificateChainText;
-import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil.convertToOpenSSLFormat;
+import static in.neuw.aws.rolesanywhere.utils.CertificateChainGeneratorTestUtil.convertToPEM;
+import static in.neuw.aws.rolesanywhere.utils.CertificateChainGeneratorTestUtil.generateCertificateChainText;
+import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil.convertToOpenSSLFormat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
@@ -60,7 +60,7 @@ class CoreNegativeV2Tests {
 
     @Test
     void noSuchProviderExceptionErrorTest() throws Exception {
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 
@@ -93,7 +93,7 @@ class CoreNegativeV2Tests {
 
     @Test
     void certNotGoodTest() throws Exception {
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
 
         System.out.println(convertToPEM(ecKeyPair.getPrivate()));
@@ -121,7 +121,7 @@ class CoreNegativeV2Tests {
 
     @Test
     void certNotGoodV2Test() throws Exception {
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
 
         System.out.println(convertToPEM(ecKeyPair.getPrivate()));
@@ -149,7 +149,7 @@ class CoreNegativeV2Tests {
 
     @Test
     void certificateExceptionErrorTest() throws Exception {
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
         var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
 

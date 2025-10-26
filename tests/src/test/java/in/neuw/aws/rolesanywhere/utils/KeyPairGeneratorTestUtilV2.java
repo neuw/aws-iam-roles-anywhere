@@ -12,7 +12,7 @@ import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Base64;
 
-public class KeyPairGeneratorUtilV2 {
+public class KeyPairGeneratorTestUtilV2 {
 
     static {
         Security.addProvider(new BouncyCastleProvider());

@@ -7,7 +7,7 @@ import in.neuw.aws.rolesanywhere.credentials.models.Credentials;
 
 import java.util.ArrayList;
 
-public class MockAwsRolesAnywhereSessionsResponseGenerator {
+public class MockAwsRolesAnywhereSessionsResponseGeneratorTestUtil {
 
     public static AwsRolesAnywhereSessionsResponse mockAwsRolesAnywhereSessionsResponse() {
         var listCredentialSet = new ArrayList<CredentialSet>();

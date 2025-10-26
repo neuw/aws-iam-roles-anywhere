@@ -1,7 +1,7 @@
 package in.neuw.aws.rolesanywhere;
 
 import in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader;
-import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorUtil;
+import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,14 +19,14 @@ class CertAndKeyParserAndLoaderTests {
 
     @Test
     void ECkeyResolveSignatureAlgorithmTest() throws Exception {
-        var ecKeyPair = KeyPairGeneratorUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var alg = CertAndKeyParserAndLoader.resolveSignatureAlgorithm(ecKeyPair.getPrivate());
         Assertions.assertEquals("SHA256withECDSA", alg);
     }
 
     @Test
     void RSAkeyResolveSignatureAlgorithmTest() throws Exception {
-        var rsaKeyPair = KeyPairGeneratorUtil.generateKeyPair("RSA", 2048);
+        var rsaKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("RSA", 2048);
         var alg = CertAndKeyParserAndLoader.resolveSignatureAlgorithm(rsaKeyPair.getPrivate());
         Assertions.assertEquals("SHA256withRSA", alg);
     }
