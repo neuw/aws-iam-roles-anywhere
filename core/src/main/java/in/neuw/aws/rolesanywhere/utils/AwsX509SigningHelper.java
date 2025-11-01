@@ -16,9 +16,7 @@ import software.amazon.awssdk.services.iam.model.IamException;
 import software.amazon.awssdk.utils.BinaryUtils;
 import software.amazon.awssdk.utils.IoUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
@@ -40,7 +38,8 @@ import static software.amazon.awssdk.http.auth.aws.internal.signer.util.SignerCo
 @Slf4j
 public class AwsX509SigningHelper {
 
-    private AwsX509SigningHelper() {}
+    private AwsX509SigningHelper() {
+    }
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC);
@@ -128,9 +127,9 @@ public class AwsX509SigningHelper {
     }
 
     public static SortedMap<String, String> canonicalHeaders(final String host,
-                                                       final String contentType,
-                                                       final String date,
-                                                       final String derX509) {
+                                                             final String contentType,
+                                                             final String date,
+                                                             final String derX509) {
         var headers = new TreeMap<String, String>();
         headers.put(CONTENT_TYPE.toLowerCase(), contentType);
         headers.put(HOST.toLowerCase(), host);
@@ -166,7 +165,7 @@ public class AwsX509SigningHelper {
     }
 
     public static String resolveHostEndpoint(final Region region) {
-        return "https://"+resolveHostBasedOnRegion(region);
+        return "https://" + resolveHostBasedOnRegion(region);
     }
 
     public static String resolveAwsAlgorithm(final PrivateKey key) {
@@ -209,7 +208,7 @@ public class AwsX509SigningHelper {
                                              final X509Certificate cert,
                                              final PrivateKey key) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         var certId = cert.getSerialNumber().toString();
-        var credentialPart = certId+"/"+credentialScope(instant, region);
+        var credentialPart = certId + "/" + credentialScope(instant, region);
         var signedContent = sign(contentToSign, key);
 
         return algorithm +
@@ -272,7 +271,11 @@ public class AwsX509SigningHelper {
             log.info("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
             return om.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
         } else {
-            log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
+            final OutputStream baos = new ByteArrayOutputStream();
+            if (log.isErrorEnabled() && requestSpec.responseBody().isPresent()) {
+                requestSpec.responseBody().get().transferTo(baos);
+            }
+            log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint: {}", baos);
             throw IamException.builder()
                     .message("failed response for the AWS ROLES ANYWHERE SESSION endpoint")
                     .build();
