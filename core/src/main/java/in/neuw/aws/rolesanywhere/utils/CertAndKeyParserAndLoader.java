@@ -53,51 +53,6 @@ import java.util.List;
  * ❌ Wrong:     Just the PEM file as-is // No Base64 encoding applied
  * </pre>
  *
- * <p><strong>Example - Certificate Encoding:</strong></p>
- * <pre>
- * Original file (cert.pem):
- * -----BEGIN CERTIFICATE-----
- * MIIDRzCCAi+gAwIBAgIQ...
- * -----END CERTIFICATE-----
- *
- * Encoding (choose one):
- * # Command line (Linux/macOS):
- * base64 -i cert.pem
- *
- * # Command line (Windows PowerShell):
- * [Convert]::ToBase64String([IO.File]::ReadAllBytes("cert.pem"))
- *
- * # Java:
- * Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get("cert.pem")))
- * </pre>
- *
- * <p><strong>Example - Private Key Encoding:</strong></p>
- * <pre>
- * Original file (key.pem):
- * -----BEGIN PRIVATE KEY-----
- * MIIEvQIBADANBgkq...
- * -----END PRIVATE KEY-----
- *
- * Encoding:
- * base64 -i key.pem
- * </pre>
- *
- * <h2>Supported Formats</h2>
- *
- * <p><strong>Certificates:</strong></p>
- * <ul>
- *   <li>Single X.509 certificates in PEM format</li>
- *   <li>Certificate chains (multiple certificates concatenated)</li>
- *   <li>Leaf certificates, intermediate CA, and root CA certificates</li>
- * </ul>
- *
- * <p><strong>Private Keys:</strong></p>
- * <ul>
- *   <li>PKCS#1 format: {@code -----BEGIN RSA PRIVATE KEY-----} or {@code -----BEGIN EC PRIVATE KEY-----}</li>
- *   <li>PKCS#8 format: {@code -----BEGIN PRIVATE KEY-----}</li>
- *   <li>RSA and EC (Elliptic Curve) algorithms</li>
- * </ul>
- *
  * <h2>Why This Encoding Strategy?</h2>
  *
  * <p>PEM files contain both:</p>
