@@ -188,6 +188,54 @@ Run tests with: `mvn clean verify`
 | 0.4.5   | 2.31.50    | 3.5.0       | Spring Boot 3.5.0 support          |
 | 0.4.4   | 2.31.50    | 3.4.6       | Stability improvements             |
 
+### Encoding Certificate and Key Files
+
+The library requires Base64-encoded certificate and private key values. Here's how to encode your PEM files:
+
+#### Using Command Line (Linux/macOS)
+
+**Encode a certificate:**
+```bash
+base64 -i certificate.pem
+```
+
+**Encode a private key:**
+```bash
+base64 -i private-key.key
+```
+
+#### Using Java
+
+```java
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
+
+public class FileEncoder {
+    public static String encodeFile(String filePath) throws Exception {
+        byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
+        return Base64.getEncoder().encodeToString(fileContent);
+    }
+
+    public static void main(String[] args) throws Exception {
+        String encodedCert = encodeFile("certificate.pem");
+        String encodedKey = encodeFile("private-key.key");
+
+        System.out.println("Encoded Certificate:");
+        System.out.println(encodedCert);
+        System.out.println("\nEncoded Private Key:");
+        System.out.println(encodedKey);
+    }
+}
+```
+
+#### Important Notes
+
+- The encoded values should **not** contain line breaks when used in the configuration
+- Keep the encoded private key secure - treat it with the same care as the original key file
+- The PEM files must contain the proper headers (`-----BEGIN CERTIFICATE-----`, etc.) before encoding
+- For certificate chains, complete chain needs to be encoded.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
