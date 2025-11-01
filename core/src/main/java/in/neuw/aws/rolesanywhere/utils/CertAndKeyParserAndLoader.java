@@ -26,6 +26,102 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * Utility class for parsing and loading X.509 certificates and private keys from Base64-encoded PEM format.
+ *
+ * <h2>Input Format - Critical Information</h2>
+ *
+ * <p><strong>All methods in this class expect a SINGLE layer of Base64 encoding applied to PEM-formatted content.</strong></p>
+ *
+ * <p><strong>Encoding Process:</strong></p>
+ * <ol>
+ *   <li>Start with a PEM file (certificate or private key) that includes headers like:
+ *       <ul>
+ *         <li>{@code -----BEGIN CERTIFICATE-----}</li>
+ *         <li>{@code -----BEGIN PRIVATE KEY-----}</li>
+ *         <li>{@code -----BEGIN RSA PRIVATE KEY-----}</li>
+ *       </ul>
+ *   </li>
+ *   <li>Apply Base64 encoding to the <strong>entire file content</strong> (including headers and footers)</li>
+ *   <li>Pass the resulting Base64 string to the methods in this class</li>
+ * </ol>
+ *
+ * <p><strong>What this means:</strong></p>
+ * <pre>
+ * ✅ Correct:   Base64(entire-PEM-file) // Encode the complete PEM file including headers
+ * ❌ Wrong:     Base64(raw-DER-bytes)   // Raw certificate bytes without PEM structure
+ * ❌ Wrong:     Just the PEM file as-is // No Base64 encoding applied
+ * </pre>
+ *
+ * <p><strong>Example - Certificate Encoding:</strong></p>
+ * <pre>
+ * Original file (cert.pem):
+ * -----BEGIN CERTIFICATE-----
+ * MIIDRzCCAi+gAwIBAgIQ...
+ * -----END CERTIFICATE-----
+ *
+ * Encoding (choose one):
+ * # Command line (Linux/macOS):
+ * base64 -i cert.pem
+ *
+ * # Command line (Windows PowerShell):
+ * [Convert]::ToBase64String([IO.File]::ReadAllBytes("cert.pem"))
+ *
+ * # Java:
+ * Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get("cert.pem")))
+ * </pre>
+ *
+ * <p><strong>Example - Private Key Encoding:</strong></p>
+ * <pre>
+ * Original file (key.pem):
+ * -----BEGIN PRIVATE KEY-----
+ * MIIEvQIBADANBgkq...
+ * -----END PRIVATE KEY-----
+ *
+ * Encoding:
+ * base64 -i key.pem
+ * </pre>
+ *
+ * <h2>Supported Formats</h2>
+ *
+ * <p><strong>Certificates:</strong></p>
+ * <ul>
+ *   <li>Single X.509 certificates in PEM format</li>
+ *   <li>Certificate chains (multiple certificates concatenated)</li>
+ *   <li>Leaf certificates, intermediate CA, and root CA certificates</li>
+ * </ul>
+ *
+ * <p><strong>Private Keys:</strong></p>
+ * <ul>
+ *   <li>PKCS#1 format: {@code -----BEGIN RSA PRIVATE KEY-----} or {@code -----BEGIN EC PRIVATE KEY-----}</li>
+ *   <li>PKCS#8 format: {@code -----BEGIN PRIVATE KEY-----}</li>
+ *   <li>RSA and EC (Elliptic Curve) algorithms</li>
+ * </ul>
+ *
+ * <h2>Why This Encoding Strategy?</h2>
+ *
+ * <p>PEM files contain both:</p>
+ * <ul>
+ *   <li>Headers/footers that identify the content type (e.g., {@code -----BEGIN CERTIFICATE-----})</li>
+ *   <li>Base64-encoded binary data (the actual certificate or key)</li>
+ * </ul>
+ *
+ * <p>When storing PEM files in environment variables or configuration files, we need to encode
+ * the entire PEM structure (headers + content) as a single Base64 string. This class then:</p>
+ * <ol>
+ *   <li>Decodes the Base64 string ONCE to recover the PEM format</li>
+ *   <li>Uses the PEM headers to identify content type and format</li>
+ *   <li>Parses the PEM content using standard Java/BouncyCastle libraries</li>
+ * </ol>
+ *
+ * <p><strong>This is NOT double-encoding.</strong> The PEM format itself uses Base64 for the certificate/key data,
+ * apply an additional (outer) Base64 encoding to make the entire PEM file safe for storage in configuration systems.</p>
+ *
+ * @see #extractCertificate(String)
+ * @see #extractCertificates(String)
+ * @see #extractPrivateKey(String)
+ * @see #possibleChainOfCerts(String)
+ */
 @Slf4j
 public class CertAndKeyParserAndLoader {
 
@@ -40,9 +136,32 @@ public class CertAndKeyParserAndLoader {
     public static final String SHA256_RSA = "SHA256withRSA";
     public static final String SHA256_EC_DSA = "SHA256withECDSA";
 
+    /**
+     * Extracts a single X.509 certificate from a Base64-encoded PEM certificate.
+     *
+     * <p><strong>Input Format:</strong> Base64(PEM-formatted-certificate)</p>
+     * <p>The input must be the result of Base64-encoding a complete PEM certificate file,
+     * including the {@code -----BEGIN CERTIFICATE-----} and {@code -----END CERTIFICATE-----} headers.</p>
+     *
+     * <p><strong>Example encoding:</strong></p>
+     * <pre>
+     * # From command line:
+     * base64 -i certificate.pem
+     *
+     * # From Java:
+     * String encoded = Base64.getEncoder().encodeToString(
+     *     Files.readAllBytes(Paths.get("certificate.pem"))
+     * );
+     * </pre>
+     *
+     * @param base64EncodedCert Base64-encoded PEM certificate (single encoding layer)
+     * @return the parsed X.509 certificate
+     * @throws SdkException if certificate parsing fails
+     */
     public static X509Certificate extractCertificate(final String base64EncodedCert) {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            // Decode the Base64 ONCE to get the original PEM content
             byte[] decodedCertificate = Base64.getDecoder().decode(base64EncodedCert);
             X509Certificate cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(decodedCertificate));
             log.info("Certificate expires at {}", cert.getNotAfter());
@@ -53,9 +172,48 @@ public class CertAndKeyParserAndLoader {
         }
     }
 
+    /**
+     * Extracts one or multiple X.509 certificates from a Base64-encoded PEM certificate file/chain.
+     *
+     * <p><strong>Input Format:</strong> Base64(PEM-formatted-certificate-chain)</p>
+     * <p>The input must be the result of Base64-encoding a PEM file containing one or more certificates,
+     * each with {@code -----BEGIN CERTIFICATE-----} and {@code -----END CERTIFICATE-----} headers.</p>
+     *
+     * <p><strong>Example - Single certificate:</strong></p>
+     * <pre>
+     * Original PEM file:
+     * -----BEGIN CERTIFICATE-----
+     * MIIDRzCCAi+gAwIBAgIQ...
+     * -----END CERTIFICATE-----
+     *
+     * Encoding: base64 -i certificate.pem
+     * </pre>
+     *
+     * <p><strong>Example - Certificate chain:</strong></p>
+     * <pre>
+     * Original PEM file:
+     * -----BEGIN CERTIFICATE-----
+     * MIIDRzCCAi+gAwIBAgIQ... (Leaf)
+     * -----END CERTIFICATE-----
+     * -----BEGIN CERTIFICATE-----
+     * MIIEADCCAuigAwIBAgIR... (Intermediate)
+     * -----END CERTIFICATE-----
+     * -----BEGIN CERTIFICATE-----
+     * MIIDdzCCAl+gAwIBAgIJ... (Root)
+     * -----END CERTIFICATE-----
+     *
+     * Encoding: base64 -i chain.pem
+     * </pre>
+     *
+     * @param base64EncodedCert Base64-encoded PEM certificate or certificate chain (single encoding layer)
+     * @return list of parsed X.509 certificates in the order they appear in the PEM file
+     * @throws CertificateException if certificate parsing fails
+     * @throws NoSuchProviderException if BouncyCastle provider is not available
+     */
     public static List<X509Certificate> extractCertificates(final String base64EncodedCert) throws CertificateException, NoSuchProviderException {
         Security.addProvider(new BouncyCastleProvider());
         CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
+        // Decode the Base64 ONCE to get the original PEM content
         var inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(base64EncodedCert));
 
         List<X509Certificate> certificates = new ArrayList<>();
@@ -66,18 +224,109 @@ public class CertAndKeyParserAndLoader {
         return certificates;
     }
 
-    public static boolean possibleChainOfCerts(final String base64EncodedCert) {
-        String rawCertFile = new String(Base64.getDecoder().decode(base64EncodedCert));
-        if (countOccurrencesOfBEGINCERT(rawCertFile) == 1) {
+    /**
+     * Determines if the provided certificate content contains a chain of certificates or a single certificate.
+     *
+     * <p><strong>IMPORTANT - Input Format:</strong></p>
+     * <p>This method expects the input to be a <strong>single layer of Base64 encoding</strong> applied to a PEM-formatted certificate file.</p>
+     *
+     * <p><strong>Step-by-step encoding process:</strong></p>
+     * <ol>
+     *   <li>Start with a PEM file containing certificate(s) with headers:
+     *   <pre>
+     *   -----BEGIN CERTIFICATE-----
+     *   MIIDRzCCAi+gAwIBAgIQ...
+     *   -----END CERTIFICATE-----
+     *   </pre>
+     *   </li>
+     *   <li>Apply Base64 encoding to the <strong>entire PEM file content</strong> (including headers and footers):
+     *   <pre>
+     *   base64 -i certificate.pem
+     *   </pre>
+     *   This produces a string like: {@code LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t...}
+     *   </li>
+     *   <li>Pass this Base64-encoded string to this method</li>
+     * </ol>
+     *
+     * <p><strong>What this method does internally:</strong></p>
+     * <ul>
+     *   <li>Decodes the Base64 string once to recover the original PEM-formatted content</li>
+     *   <li>Counts occurrences of {@code -----BEGIN CERTIFICATE-----} headers</li>
+     *   <li>Returns {@code true} if multiple certificates are found (chain), {@code false} if only one</li>
+     * </ul>
+     *
+     * <p><strong>Example - Single Certificate:</strong></p>
+     * <pre>
+     * Original PEM file (certificate.pem):
+     * -----BEGIN CERTIFICATE-----
+     * MIIDRzCCAi+gAwIBAgIQ...
+     * -----END CERTIFICATE-----
+     *
+     * Encoding command:
+     * base64 -i certificate.pem
+     *
+     * Result: This method returns {@code false}
+     * </pre>
+     *
+     * <p><strong>Example - Certificate Chain:</strong></p>
+     * <pre>
+     * Original PEM file (chain.pem):
+     * -----BEGIN CERTIFICATE-----
+     * MIIDRzCCAi+gAwIBAgIQ...  (Leaf Certificate)
+     * -----END CERTIFICATE-----
+     * -----BEGIN CERTIFICATE-----
+     * MIIEADCCAuigAwIBAgIR...  (Intermediate CA)
+     * -----END CERTIFICATE-----
+     * -----BEGIN CERTIFICATE-----
+     * MIIDdzCCAl+gAwIBAgIJ...  (Root CA)
+     * -----END CERTIFICATE-----
+     *
+     * Encoding command:
+     * base64 -i chain.pem
+     *
+     * Result: This method returns {@code true}
+     * </pre>
+     *
+     * <p><strong>Common Misconception:</strong></p>
+     * <p>This method expects exactly ONE Base64 encoding operation applied to the PEM file:</p>
+     * <ul>
+     *   <li>✅ Correct: {@code Base64(complete-PEM-file)} - Encode the entire PEM file once</li>
+     *   <li>❌ Wrong: {@code Raw DER/binary certificate bytes} - Missing PEM structure and encoding</li>
+     *   <li>❌ Wrong: {@code PEM file without Base64 encoding} - Missing the required encoding layer</li>
+     * </ul>
+     * <p><strong>Note:</strong> PEM files internally contain base64-encoded certificate data between the headers.
+     * We are NOT encoding that data again - we are encoding the <em>entire PEM file</em> (headers + base64 content)
+     * for safe storage in configuration systems.</p>
+     *
+     * @param base64EncodedCertContent the Base64-encoded PEM certificate file content.
+     *                                 Must be the result of encoding a PEM file (with headers) using Base64.
+     *                                 Example: output of {@code base64 -i certificate.pem} or
+     *                                 {@code Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get("certificate.pem")))}
+     * @return {@code true} if the decoded content contains multiple certificates (a chain),
+     *         {@code false} if it contains a single certificate
+     * @throws SdkException if the decoded content doesn't contain valid PEM certificate headers
+     */
+    public static boolean possibleChainOfCerts(final String base64EncodedCertContent) {
+        // Decode the Base64 string ONCE to get back the original PEM-formatted content
+        // Expected result after decoding: PEM text with "-----BEGIN CERTIFICATE-----" headers
+        String rawCertFile = new String(Base64.getDecoder().decode(base64EncodedCertContent));
+
+        // Count how many certificate headers are present in the PEM content
+        int certCount = countOccurrencesOfBEGINCERT(rawCertFile);
+
+        if (certCount == 1) {
             log.info("only one cert provided");
-        } else if (countOccurrencesOfBEGINCERT(rawCertFile) > 1) {
-            log.info("possible chain of certificates");
+            return false;
+        } else if (certCount > 1) {
+            log.info("possible chain of certificates (found {} certificates)", certCount);
             return true;
         } else {
-            log.error("cert not provided correctly");
-            throw SdkException.builder().message("cert not provided correctly").build();
+            // No valid certificate headers found - input format is incorrect
+            log.error("cert not provided correctly - no PEM headers found after Base64 decoding");
+            throw SdkException.builder()
+                    .message("Certificate not provided correctly. Expected Base64-encoded PEM format with certificate headers.")
+                    .build();
         }
-        return false;
     }
 
     public static X509CertificateChain resolveCertificateChain(final String base64EncodedCert) throws CertificateException, NoSuchProviderException {
@@ -115,7 +364,51 @@ public class CertAndKeyParserAndLoader {
         return Base64.getEncoder().encodeToString(sw.toString().getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Extracts a private key from a Base64-encoded PEM private key file.
+     *
+     * <p><strong>Input Format:</strong> Base64(PEM-formatted-private-key)</p>
+     * <p>The input must be the result of Base64-encoding a complete PEM private key file,
+     * including the appropriate headers. Supports both PKCS#1 and PKCS#8 formats.</p>
+     *
+     * <p><strong>Supported PEM formats:</strong></p>
+     * <ul>
+     *   <li>PKCS#1 RSA: {@code -----BEGIN RSA PRIVATE KEY-----}</li>
+     *   <li>PKCS#1 EC: {@code -----BEGIN EC PRIVATE KEY-----}</li>
+     *   <li>PKCS#8: {@code -----BEGIN PRIVATE KEY-----}</li>
+     * </ul>
+     *
+     * <p><strong>Example - PKCS#1 format:</strong></p>
+     * <pre>
+     * Original PEM file (private-key.pem):
+     * -----BEGIN RSA PRIVATE KEY-----
+     * MIIEpAIBAAKCAQEA...
+     * -----END RSA PRIVATE KEY-----
+     *
+     * Encoding command:
+     * base64 -i private-key.pem
+     * </pre>
+     *
+     * <p><strong>Example - PKCS#8 format:</strong></p>
+     * <pre>
+     * Original PEM file (private-key.pem):
+     * -----BEGIN PRIVATE KEY-----
+     * MIIEvQIBADANBgkq...
+     * -----END PRIVATE KEY-----
+     *
+     * Encoding command:
+     * base64 -i private-key.pem
+     * </pre>
+     *
+     * <p><strong>Important:</strong> Like certificate encoding, this uses a <strong>single layer of Base64 encoding</strong>.
+     * Do NOT double-encode the private key.</p>
+     *
+     * @param base64EncodedPrivateKey Base64-encoded PEM private key (PKCS#1 or PKCS#8 format, single encoding layer)
+     * @return the parsed private key (RSA or EC)
+     * @throws SdkException if key parsing fails or format is unsupported
+     */
     public static PrivateKey extractPrivateKey(final String base64EncodedPrivateKey) {
+        // Decode the Base64 ONCE to get the original PEM content
         var privateKeyBytes = Base64.getDecoder().decode(base64EncodedPrivateKey);
         try {
             return privateKeyResolver(privateKeyBytes);
