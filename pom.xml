@@ -44,8 +44,8 @@
     <java.version>17</java.version>
     <parent.version>${project.version}</parent.version>
     <jackson-bom.version>2.20.0</jackson-bom.version>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
     <jacoco.version>0.8.10</jacoco.version>
     <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>

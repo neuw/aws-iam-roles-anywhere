@@ -414,12 +414,14 @@ public class CertAndKeyParserAndLoader {
         PrivateKeyInfo privateKeyInfo;
         String originalFormat;
 
-        if (inputPemObject instanceof PEMKeyPair keyPair) {
+        if (inputPemObject instanceof PEMKeyPair) {
+            final var keyPair = (PEMKeyPair) inputPemObject;
             // Handle PKCS#1 format (RSA PRIVATE KEY, EC PRIVATE KEY, etc.)
             originalFormat = "PKCS#1";
             privateKeyInfo = keyPair.getPrivateKeyInfo();
             log.info("Private key Input format: PKCS#1 (Traditional format)");
-        } else if (inputPemObject instanceof PrivateKeyInfo instancePrivateKeyInfo) {
+        } else if (inputPemObject instanceof PrivateKeyInfo) {
+            final var instancePrivateKeyInfo = (PrivateKeyInfo) inputPemObject;
             // Handle PKCS#8 format (PRIVATE KEY)
             originalFormat = "PKCS#8";
             privateKeyInfo = instancePrivateKeyInfo;
