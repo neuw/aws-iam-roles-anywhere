@@ -1,10 +1,7 @@
 package in.neuw.aws.rolesanywhere.credentials;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnyWhereRequesterDetails;
-import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsRequest;
-import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsResponse;
-import in.neuw.aws.rolesanywhere.credentials.models.X509CertificateChain;
+import in.neuw.aws.rolesanywhere.credentials.models.*;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
 import lombok.SneakyThrows;
@@ -53,9 +50,9 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
 
     @Override
     AwsSessionCredentials getUpdatedCredentials() {
-        var response = refreshCredentials();
+        AwsRolesAnywhereSessionsResponse response = refreshCredentials();
         // reckon, it will be just one credential
-        var credentials = response.getCredentialSet().get(0);
+        CredentialSet credentials = response.getCredentialSet().get(0);
         log.info("fetched credentials at epoch seconds = {} with expiry epoch seconds = {}",
                 Instant.now().getEpochSecond(),
                 getInstantFromResponseExpiry(credentials.getCredentials().getExpiration()).getEpochSecond());

@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -25,6 +26,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Utility class for parsing and loading X.509 certificates and private keys from Base64-encoded PEM format.
@@ -169,10 +171,10 @@ public class CertAndKeyParserAndLoader {
         Security.addProvider(new BouncyCastleProvider());
         CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
         // Decode the Base64 ONCE to get the original PEM content
-        var inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(base64EncodedCert));
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(base64EncodedCert));
 
         List<X509Certificate> certificates = new ArrayList<>();
-        for (var cert : cf.generateCertificates(inputStream)) {
+        for (Certificate cert : cf.generateCertificates(inputStream)) {
             certificates.add((X509Certificate) cert);
         }
 
@@ -285,11 +287,11 @@ public class CertAndKeyParserAndLoader {
     }
 
     public static X509CertificateChain resolveCertificateChain(final String base64EncodedCert) throws CertificateException, NoSuchProviderException {
-        var x509CertificateChain = new X509CertificateChain();
+        X509CertificateChain x509CertificateChain = new X509CertificateChain();
         x509CertificateChain.setBase64EncodedCertificate(base64EncodedCert);
         if (possibleChainOfCerts(base64EncodedCert)) {
-            var certs = extractCertificates(base64EncodedCert);
-            for (var cert : certs) {
+            List<X509Certificate> certs = extractCertificates(base64EncodedCert);
+            for (X509Certificate cert : certs) {
                 // root CA is different from intermediate CA
                 if(isRootCA(cert)) {
                     log.info("root CA expires at, {}", cert.getNotAfter());
@@ -310,7 +312,7 @@ public class CertAndKeyParserAndLoader {
 
     public static String convertToBase64PEMString(X509Certificate x509Cert) {
         Security.addProvider(new BouncyCastleProvider());
-        var sw = new StringWriter();
+        StringWriter sw = new StringWriter();
         try (JcaPEMWriter pw = new JcaPEMWriter(sw)) {
             pw.writeObject(x509Cert);
         } catch (IOException e) {
@@ -364,7 +366,7 @@ public class CertAndKeyParserAndLoader {
      */
     public static PrivateKey extractPrivateKey(final String base64EncodedPrivateKey) {
         // Decode the Base64 ONCE to get the original PEM content
-        var privateKeyBytes = Base64.getDecoder().decode(base64EncodedPrivateKey);
+        byte[] privateKeyBytes = Base64.getDecoder().decode(base64EncodedPrivateKey);
         try {
             return privateKeyResolver(privateKeyBytes);
         } catch (InvalidKeySpecException | IOException | NoSuchAlgorithmException | NoSuchProviderException e) {
@@ -407,22 +409,23 @@ public class CertAndKeyParserAndLoader {
     public static PrivateKey privateKeyResolver(final byte[] key) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         Security.addProvider(new BouncyCastleProvider());
 
-        var byteArrayInputStream = new ByteArrayInputStream(key);
-        var pemParser = new PEMParser(new InputStreamReader(byteArrayInputStream));
-        var inputPemObject = pemParser.readObject();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(key);
+        PEMParser pemParser = new PEMParser(new InputStreamReader(byteArrayInputStream));
+        Object inputPemObject = pemParser.readObject();
 
         PrivateKeyInfo privateKeyInfo;
         String originalFormat;
 
-        if (inputPemObject instanceof PEMKeyPair keyPair) {
+        if (inputPemObject instanceof PEMKeyPair) {
             // Handle PKCS#1 format (RSA PRIVATE KEY, EC PRIVATE KEY, etc.)
+            PEMKeyPair keyPair = (PEMKeyPair) inputPemObject;
             originalFormat = "PKCS#1";
             privateKeyInfo = keyPair.getPrivateKeyInfo();
             log.info("Private key Input format: PKCS#1 (Traditional format)");
-        } else if (inputPemObject instanceof PrivateKeyInfo instancePrivateKeyInfo) {
+        } else if (inputPemObject instanceof PrivateKeyInfo) {
             // Handle PKCS#8 format (PRIVATE KEY)
+            privateKeyInfo = (PrivateKeyInfo) inputPemObject;
             originalFormat = "PKCS#8";
-            privateKeyInfo = instancePrivateKeyInfo;
             log.info("Private key Input format: PKCS#8 (Modern format)");
         } else {
             throw new IllegalArgumentException("Unsupported key format: " + inputPemObject.getClass().getName() +
@@ -430,13 +433,13 @@ public class CertAndKeyParserAndLoader {
         }
 
         // Extract algorithm and create key
-        var encodedKey = privateKeyInfo.getEncoded();
-        var algorithm = privateKeyInfo.getPrivateKeyAlgorithm().getAlgorithm();
-        var keyType = resolveKeyType(algorithm);
+        byte[] encodedKey = privateKeyInfo.getEncoded();
+        ASN1ObjectIdentifier algorithm = privateKeyInfo.getPrivateKeyAlgorithm().getAlgorithm();
+        String keyType = resolveKeyType(algorithm);
 
-        var keySpec = new PKCS8EncodedKeySpec(encodedKey);
-        var keyFactory = KeyFactory.getInstance(keyType, "BC");
-        var privateKey = keyFactory.generatePrivate(keySpec);
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedKey);
+        KeyFactory keyFactory = KeyFactory.getInstance(keyType, "BC");
+        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
 
         log.info("Private key successfully loaded. Original format: {}, Private key algorithm: {}, internal format: {}", originalFormat, privateKey.getAlgorithm(), privateKey.getFormat());
 
