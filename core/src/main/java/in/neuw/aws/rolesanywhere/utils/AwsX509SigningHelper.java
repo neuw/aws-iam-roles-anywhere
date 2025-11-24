@@ -31,11 +31,11 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader.*;
-import static software.amazon.awssdk.auth.signer.internal.SignerConstant.AUTHORIZATION;
-import static software.amazon.awssdk.auth.signer.internal.SignerConstant.AWS4_TERMINATOR;
+import static software.amazon.awssdk.http.auth.aws.signer.SignerConstant.AUTHORIZATION;
+import static software.amazon.awssdk.http.auth.aws.signer.SignerConstant.AWS4_TERMINATOR;
 import static software.amazon.awssdk.http.Header.CONTENT_TYPE;
 import static software.amazon.awssdk.http.Header.HOST;
-import static software.amazon.awssdk.http.auth.aws.internal.signer.util.SignerConstant.X_AMZ_DATE;
+import static software.amazon.awssdk.http.auth.aws.signer.SignerConstant.X_AMZ_DATE;
 
 @Slf4j
 public class AwsX509SigningHelper {
