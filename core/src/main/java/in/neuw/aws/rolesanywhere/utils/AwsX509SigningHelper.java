@@ -259,6 +259,7 @@ public class AwsX509SigningHelper {
             return getAwsRolesAnywhereSessionsResponse(om, requestSpec);
         } catch (NoSuchAlgorithmException | IOException | CertificateException | NoSuchProviderException |
                  SignatureException | InvalidKeyException | IamException e) {
+            log.error("could not getIamRolesAnywhereSessions", e);
             throw IamException.builder()
                     .message("Error while trying to connect to AWS ROLES ANYWHERE")
                     .build();
@@ -272,7 +273,11 @@ public class AwsX509SigningHelper {
             log.info("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
             return om.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
         } else {
-            log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
+            final OutputStream baos = new ByteArrayOutputStream();
+            if (log.isErrorEnabled() && requestSpec.responseBody().isPresent()) {
+                requestSpec.responseBody().get().transferTo(baos);
+            }
+            log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint: {}", baos);
             throw IamException.builder()
                     .message("failed response for the AWS ROLES ANYWHERE SESSION endpoint")
                     .build();
