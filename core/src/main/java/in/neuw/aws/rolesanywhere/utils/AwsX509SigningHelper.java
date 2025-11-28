@@ -1,6 +1,5 @@
 package in.neuw.aws.rolesanywhere.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnyWhereRequesterDetails;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsRequest;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsResponse;
@@ -15,6 +14,7 @@ import software.amazon.awssdk.regions.servicemetadata.RolesanywhereServiceMetada
 import software.amazon.awssdk.services.iam.model.IamException;
 import software.amazon.awssdk.utils.BinaryUtils;
 import software.amazon.awssdk.utils.IoUtils;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class AwsX509SigningHelper {
 
     private AwsX509SigningHelper() {}
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final JsonMapper OBJECT_MAPPER = new JsonMapper();
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC);
     private static final String LINE_SEPARATOR = "\n";
     private static final String SEMI_COLON = ";";
@@ -228,10 +228,10 @@ public class AwsX509SigningHelper {
             final AwsRolesAnywhereSessionsRequest sessionsRequest,
             final AwsRolesAnyWhereRequesterDetails requesterDetails,
             final SdkHttpClient sdkHttpClient,
-            final ObjectMapper om) {
+            final JsonMapper jm) {
 
         try {
-            String request = om.writeValueAsString(sessionsRequest);
+            String request = jm.writeValueAsString(sessionsRequest);
             Region awsRegion = requesterDetails.getRegion();
             String host = resolveHostBasedOnRegion(awsRegion);
             X509CertificateChain x509CertificateChain = resolveCertificateChain(requesterDetails.getEncodedX509Certificate());
@@ -256,7 +256,7 @@ public class AwsX509SigningHelper {
             log.debug("Status Code is {} for AWS roles anywhere session endpoint", requestSpec.httpResponse().statusCode());
 
             // Read and print response body
-            return getAwsRolesAnywhereSessionsResponse(om, requestSpec);
+            return getAwsRolesAnywhereSessionsResponse(jm, requestSpec);
         } catch (NoSuchAlgorithmException | IOException | CertificateException | NoSuchProviderException |
                  SignatureException | InvalidKeyException | IamException e) {
             throw IamException.builder()
@@ -265,12 +265,12 @@ public class AwsX509SigningHelper {
         }
     }
 
-    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(ObjectMapper om, HttpExecuteResponse requestSpec) throws IOException {
+    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(JsonMapper jm, HttpExecuteResponse requestSpec) throws IOException {
         if (requestSpec.httpResponse().statusCode() == 201 && requestSpec.responseBody().isPresent()) {
             AbortableInputStream content = requestSpec.responseBody().get();
             String responseBody = IoUtils.toUtf8String(content);
             log.info("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
-            return om.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
+            return jm.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
         } else {
             log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
             throw IamException.builder()

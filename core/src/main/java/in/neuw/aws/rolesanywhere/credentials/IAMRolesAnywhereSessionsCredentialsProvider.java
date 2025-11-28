@@ -1,6 +1,5 @@
 package in.neuw.aws.rolesanywhere.credentials;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.models.*;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
@@ -13,6 +12,7 @@ import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.utils.StringUtils;
 import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.security.PrivateKey;
 import java.time.Instant;
@@ -71,14 +71,14 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
 
     public AwsRolesAnywhereSessionsResponse refreshCredentials() {
         log.info("re-fetching credentials for 'roles anywhere AWS service'");
-        return fetchCredentials(awsRolesAnywhereSessionsRequest, requesterDetails, sdkHttpClient, objectMapper);
+        return fetchCredentials(awsRolesAnywhereSessionsRequest, requesterDetails, sdkHttpClient, jsonMapper);
     }
 
     private AwsRolesAnywhereSessionsResponse fetchCredentials(final AwsRolesAnywhereSessionsRequest awsRolesAnywhereSessionsRequest,
                                                               final AwsRolesAnyWhereRequesterDetails requesterDetails,
                                                               final SdkHttpClient sdkHttpClient,
-                                                              final ObjectMapper objectMapper) {
-        return AwsX509SigningHelper.getIamRolesAnywhereSessions(awsRolesAnywhereSessionsRequest, requesterDetails, sdkHttpClient, objectMapper);
+                                                              final JsonMapper jsonMapper) {
+        return AwsX509SigningHelper.getIamRolesAnywhereSessions(awsRolesAnywhereSessionsRequest, requesterDetails, sdkHttpClient, jsonMapper);
     }
 
     @Override
@@ -114,19 +114,19 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
 
         public Builder(final IAMRolesAnywhereSessionsCredentialsProvider provider) {
             super(IAMRolesAnywhereSessionsCredentialsProvider::new, provider);
-            super.objectMapper(new ObjectMapper());
+            super.jsonMapper(new JsonMapper());
         }
 
         @SneakyThrows
         public Builder(final AwsRolesAnywhereProperties awsRolesAnywhereProperties,
-                       final ObjectMapper objectMapper) {
+                       final JsonMapper jsonMapper) {
             super(IAMRolesAnywhereSessionsCredentialsProvider::new);
             this.awsRegion = Region.of(awsRolesAnywhereProperties.getRegion());
             // the awsRegion has to be initialized first for the Rest Client
             this.initRestClient();
             // the following setters are dormant, there is a wrapper AwsRolesAnyWhereRequesterDetails, wrapping all the values.
             this.awsRolesAnywhereProperties = awsRolesAnywhereProperties;
-            this.objectMapper(objectMapper);
+            this.jsonMapper(jsonMapper);
             this.region = awsRolesAnywhereProperties.getRegion();
             this.durationSeconds = awsRolesAnywhereProperties.getDurationSeconds();
             this.roleArn = awsRolesAnywhereProperties.getRoleArn();
@@ -140,10 +140,10 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         }
 
         @SneakyThrows
-        public Builder(final ObjectMapper objectMapper) {
+        public Builder(final JsonMapper jsonMapper) {
             super(IAMRolesAnywhereSessionsCredentialsProvider::new);
             this.initRestClient();
-            this.objectMapper(objectMapper);
+            this.jsonMapper(jsonMapper);
         }
 
         public Builder region(final String region) {

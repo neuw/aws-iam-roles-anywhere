@@ -4,7 +4,7 @@
 
   <groupId>in.neuw</groupId>
   <artifactId>aws-iam-roles-anywhere</artifactId>
-  <version>0.5.8.1</version>
+  <version>1.0.0</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -43,7 +43,7 @@
     <spring-boot.version>4.0.0</spring-boot.version>
     <java.version>17</java.version>
     <parent.version>${project.version}</parent.version>
-    <jackson-bom.version>2.20.0</jackson-bom.version>
+    <jackson-bom.version>3.0.2</jackson-bom.version>
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
     <jacoco.version>0.8.10</jacoco.version>
     <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -67,7 +67,7 @@
         <type>pom</type>
       </dependency>
       <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
+        <groupId>tools.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
         <version>${jackson-bom.version}</version>
         <type>pom</type>

@@ -4,7 +4,7 @@
     <parent>
         <groupId>in.neuw</groupId>
         <artifactId>aws-iam-roles-anywhere</artifactId>
-        <version>0.5.8</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
@@ -19,7 +19,7 @@
         <java.version>8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <bouncy.castle.version>1.81</bouncy.castle.version>
+        <bouncy.castle.version>1.82</bouncy.castle.version>
     </properties>
 
     <licenses>
@@ -114,7 +114,7 @@
             <version>${bouncy.castle.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>

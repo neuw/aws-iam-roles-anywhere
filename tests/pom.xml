@@ -5,7 +5,7 @@
     <parent>
         <groupId>in.neuw</groupId>
         <artifactId>aws-iam-roles-anywhere</artifactId>
-        <version>0.5.8</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>tests</artifactId>
@@ -51,6 +51,9 @@
         <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
         <sonar.jacoco.reportPath>target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
 
     <build>

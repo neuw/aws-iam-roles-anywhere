@@ -1,6 +1,5 @@
 package in.neuw.aws.rolesanywhere;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
@@ -15,6 +14,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.iam.model.IamException;
 import software.amazon.awssdk.utils.IoUtils;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CoreNegativeTests {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = new JsonMapper();
 
     private static MockedStatic<AwsX509SigningHelper> awsX509SigningHelperMockedStatic;
     private static MockedStatic<IoUtils> ioUtilsMockedStatic;
@@ -91,7 +91,7 @@ class CoreNegativeTests {
 
         assertThrows(IamException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -125,7 +125,7 @@ class CoreNegativeTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -160,7 +160,7 @@ class CoreNegativeTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -195,7 +195,7 @@ class CoreNegativeTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -230,7 +230,7 @@ class CoreNegativeTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
