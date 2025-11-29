@@ -266,12 +266,17 @@ public class AwsX509SigningHelper {
     }
 
     private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(JsonMapper jm, HttpExecuteResponse requestSpec) throws IOException {
+        log.info("AWS Roles anywhere sessions endpoint response status: {}", requestSpec.httpResponse().statusCode());
         if (requestSpec.httpResponse().statusCode() == 201 && requestSpec.responseBody().isPresent()) {
             AbortableInputStream content = requestSpec.responseBody().get();
             String responseBody = IoUtils.toUtf8String(content);
-            log.info("Response Body from AWS roles anywhere sessions endpoint: {}", responseBody);
+            // enable complete response log via debug only
+            log.debug("Successful Response from AWS roles anywhere sessions endpoint: {}", responseBody);
             return jm.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
         } else {
+            if (requestSpec.responseBody().isPresent()) {
+                log.debug("Failed! Error Response from AWS roles anywhere sessions endpoint is: {}", IoUtils.toUtf8String(requestSpec.responseBody().get()));
+            }
             log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
             throw IamException.builder()
                     .message("failed response for the AWS ROLES ANYWHERE SESSION endpoint")

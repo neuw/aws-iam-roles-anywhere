@@ -54,7 +54,7 @@ Add the appropriate dependency to your `pom.xml`:
 #### Using the Core Library
 
 ```java
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -71,7 +71,7 @@ properties.setEncodedPrivateKey("BASE64_ENCODED_PRIVATE_KEY");
 
 // Create credentials provider using builder
 IAMRolesAnywhereSessionsCredentialsProvider credentialsProvider = 
-    new IAMRolesAnywhereSessionsCredentialsProvider.Builder(properties, new ObjectMapper())
+    new IAMRolesAnywhereSessionsCredentialsProvider.Builder(properties, new JsonMapper())
         .prefetch(true)
         .asyncCredentialUpdateEnabled(false)
         .build();
