@@ -276,6 +276,8 @@ public class AwsX509SigningHelper {
         } else {
             if (requestSpec.responseBody().isPresent()) {
                 log.debug("Failed! Error Response from AWS roles anywhere sessions endpoint is: {}", IoUtils.toUtf8String(requestSpec.responseBody().get()));
+            } else {
+                log.debug("Failed! No Error Response from AWS roles anywhere sessions endpoint");
             }
             log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
             throw IamException.builder()
