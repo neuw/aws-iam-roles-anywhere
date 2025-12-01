@@ -14,6 +14,7 @@ import software.amazon.awssdk.regions.servicemetadata.RolesanywhereServiceMetada
 import software.amazon.awssdk.services.iam.model.IamException;
 import software.amazon.awssdk.utils.BinaryUtils;
 import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.utils.StringUtils;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.ByteArrayInputStream;
@@ -26,16 +27,15 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static in.neuw.aws.rolesanywhere.utils.CertAndKeyParserAndLoader.*;
-import static software.amazon.awssdk.http.auth.aws.signer.SignerConstant.AUTHORIZATION;
-import static software.amazon.awssdk.http.auth.aws.signer.SignerConstant.AWS4_TERMINATOR;
 import static software.amazon.awssdk.http.Header.CONTENT_TYPE;
 import static software.amazon.awssdk.http.Header.HOST;
-import static software.amazon.awssdk.http.auth.aws.signer.SignerConstant.X_AMZ_DATE;
+import static software.amazon.awssdk.http.auth.aws.signer.SignerConstant.*;
 
 @Slf4j
 public class AwsX509SigningHelper {
@@ -267,18 +267,17 @@ public class AwsX509SigningHelper {
 
     private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(JsonMapper jm, HttpExecuteResponse requestSpec) throws IOException {
         log.info("AWS Roles anywhere sessions endpoint response status: {}", requestSpec.httpResponse().statusCode());
-        if (requestSpec.httpResponse().statusCode() == 201 && requestSpec.responseBody().isPresent()) {
-            AbortableInputStream content = requestSpec.responseBody().get();
-            String responseBody = IoUtils.toUtf8String(content);
+        Optional<String> responseBody = Optional.empty();
+        if (requestSpec.responseBody().isPresent()) {
+            responseBody = Optional.of(IoUtils.toUtf8String(requestSpec.responseBody().get()));
+        }
+        if (requestSpec.httpResponse().statusCode() == 201
+                && responseBody.isPresent()) {
             // enable complete response log via debug only
             log.debug("Successful Response from AWS roles anywhere sessions endpoint: {}", responseBody);
-            return jm.readValue(responseBody, AwsRolesAnywhereSessionsResponse.class);
+            return jm.readValue(responseBody.get(), AwsRolesAnywhereSessionsResponse.class);
         } else {
-            if (requestSpec.responseBody().isPresent()) {
-                log.debug("Failed! Error Response from AWS roles anywhere sessions endpoint is: {}", IoUtils.toUtf8String(requestSpec.responseBody().get()));
-            } else {
-                log.debug("Failed! No Error Response from AWS roles anywhere sessions endpoint");
-            }
+            log.debug("Failed! Error Response from AWS roles anywhere sessions endpoint is: {}", responseBody);
             log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
             throw IamException.builder()
                     .message("failed response for the AWS ROLES ANYWHERE SESSION endpoint")

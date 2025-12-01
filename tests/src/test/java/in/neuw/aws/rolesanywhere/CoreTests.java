@@ -50,11 +50,11 @@ class CoreTests {
         mockedStatic = mockStatic(AwsX509SigningHelper.class, CALLS_REAL_METHODS);
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostBasedOnRegion(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "localhost:8090";
+                    return "localhost:28090";
                 });
     }
 
@@ -512,7 +512,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
@@ -547,7 +547,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
@@ -582,7 +582,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
@@ -628,7 +628,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
@@ -675,7 +675,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
@@ -722,7 +722,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
@@ -768,7 +768,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
@@ -814,7 +814,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
@@ -860,7 +860,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
@@ -906,7 +906,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
@@ -952,7 +952,7 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {

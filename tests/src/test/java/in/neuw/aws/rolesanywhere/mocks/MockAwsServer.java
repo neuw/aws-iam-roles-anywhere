@@ -29,7 +29,7 @@ public class MockAwsServer {
     }
 
     public static void init() {
-        init(8090);
+        init(28090);
     }
 
     public static void init(int port) {
@@ -54,6 +54,13 @@ public class MockAwsServer {
                                 .withStatus(201)
                                 .withHeader("Content-Type", "application/json")
                                 .withTransformers("aws-rolesanywhere-mock"))
+        );
+
+        instance.stubFor(post(urlPathEqualTo(SESSIONS_URI+"-success-empty-response"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(201)
+                                .withTransformers("aws-rolesanywhere-mock-empty-response"))
         );
 
         instance.stubFor(post(urlPathEqualTo(SESSIONS_URI+"-empty-response"))
