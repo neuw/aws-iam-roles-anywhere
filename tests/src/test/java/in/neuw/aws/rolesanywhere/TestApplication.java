@@ -1,4 +1,4 @@
-package in.neuw.aws.rolesanywhere.mocks;
+package in.neuw.aws.rolesanywhere;
 
 import in.neuw.aws.rolesanywhere.config.AwsRolesAnywhereStarterConfig;
 import org.springframework.boot.SpringApplication;

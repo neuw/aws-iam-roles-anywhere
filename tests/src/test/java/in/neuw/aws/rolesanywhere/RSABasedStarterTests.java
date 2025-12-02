@@ -2,7 +2,6 @@ package in.neuw.aws.rolesanywhere;
 
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
-import in.neuw.aws.rolesanywhere.mocks.TestApplication;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
 import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil;
 import org.junit.jupiter.api.AfterAll;
