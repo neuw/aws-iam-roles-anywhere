@@ -1,6 +1,5 @@
 package in.neuw.aws.rolesanywhere;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.core.exception.SdkException;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchProviderException;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mockStatic;
 @ExtendWith(MockitoExtension.class)
 class CoreNegativeV2Tests {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = new JsonMapper();
 
     private static MockedStatic<CertificateFactory> certificateFactoryMockedStatic;
 
@@ -84,7 +84,7 @@ class CoreNegativeV2Tests {
 
         assertThrows(NoSuchProviderException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -112,7 +112,7 @@ class CoreNegativeV2Tests {
 
         assertThrows(SdkException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -140,7 +140,7 @@ class CoreNegativeV2Tests {
 
         assertThrows(SdkException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -173,7 +173,7 @@ class CoreNegativeV2Tests {
 
         assertThrows(CertificateException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();

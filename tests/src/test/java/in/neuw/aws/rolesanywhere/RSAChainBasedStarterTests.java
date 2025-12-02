@@ -2,7 +2,6 @@ package in.neuw.aws.rolesanywhere;
 
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
-import in.neuw.aws.rolesanywhere.mocks.TestApplication;
 import in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper;
 import in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil;
 import org.junit.jupiter.api.AfterAll;
@@ -22,6 +21,7 @@ import software.amazon.awssdk.regions.Region;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import static in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper.SESSIONS_URI;
 import static in.neuw.aws.rolesanywhere.utils.CertificateChainGeneratorTestUtil.generateCertificateChainText;
 import static in.neuw.aws.rolesanywhere.utils.KeyPairGeneratorTestUtil.convertToOpenSSLFormat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,12 +50,14 @@ class RSAChainBasedStarterTests {
         mockedStatic = mockStatic(AwsX509SigningHelper.class, CALLS_REAL_METHODS);
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostBasedOnRegion(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "localhost:8090";
+                    return "localhost:28090";
                 });
+        mockedStatic.when(() -> AwsX509SigningHelper.resolveUri(any()))
+                .thenReturn("http://localhost:28090" + SESSIONS_URI);
     }
 
     @Autowired

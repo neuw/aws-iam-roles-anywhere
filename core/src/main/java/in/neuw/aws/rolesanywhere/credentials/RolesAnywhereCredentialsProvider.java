@@ -1,6 +1,5 @@
 package in.neuw.aws.rolesanywhere.credentials;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.annotations.NotThreadSafe;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
@@ -17,6 +16,7 @@ import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
 import software.amazon.awssdk.utils.cache.CachedSupplier;
 import software.amazon.awssdk.utils.cache.NonBlocking;
 import software.amazon.awssdk.utils.cache.RefreshResult;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -35,7 +35,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
      * The RestClient that should be used for periodically updating the session credentials.
      */
     final SdkHttpClient sdkHttpClient;
-    final ObjectMapper objectMapper;
+    final JsonMapper jsonMapper;
 
     /**
      * The session cache that handles automatically updating the credentials when they get close to expiring.
@@ -49,7 +49,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
 
     RolesAnywhereCredentialsProvider(BaseBuilder<?, ?> builder, String asyncThreadName) {
         this.sdkHttpClient = Validate.notNull(builder.sdkHttpClient, "sdkHttpClient must not be null.");
-        this.objectMapper = Validate.notNull(builder.objectMapper, "Object Mapper must not be null.");
+        this.jsonMapper = Validate.notNull(builder.jsonMapper, "Object Mapper must not be null.");
 
         this.staleTime = Optional.ofNullable(builder.staleTime).orElse(DEFAULT_STALE_TIME);
         this.prefetchTime = Optional.ofNullable(builder.prefetchTime).orElse(DEFAULT_PREFETCH_TIME);
@@ -141,7 +141,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
 
         private boolean asyncCredentialUpdateEnabled;
         private SdkHttpClient sdkHttpClient;
-        private ObjectMapper objectMapper;
+        private JsonMapper jsonMapper;
         private Duration staleTime;
         private Duration prefetchTime = Duration.ofMinutes(5);
         // disabled by default
@@ -153,7 +153,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
             this.asyncCredentialUpdateEnabled = provider.asyncCredentialUpdateEnabled;
             this.sdkHttpClient = provider.sdkHttpClient;
             this.staleTime = provider.staleTime;
-            this.objectMapper = provider.objectMapper;
+            this.jsonMapper = provider.jsonMapper;
         }
 
         BaseBuilder(Function<B, T> providerConstructor) {
@@ -166,8 +166,8 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
             return (B) this;
         }
 
-        public B objectMapper(ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
+        public B jsonMapper(JsonMapper jsonMapper) {
+            this.jsonMapper = jsonMapper;
             return (B) this;
         }
 

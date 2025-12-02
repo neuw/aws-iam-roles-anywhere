@@ -1,6 +1,5 @@
 package in.neuw.aws.rolesanywhere;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.mocks.MockAwsServer;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
@@ -15,6 +14,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.iam.model.IamException;
 import software.amazon.awssdk.utils.IoUtils;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CoreNegativeTests {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = new JsonMapper();
 
     private static MockedStatic<AwsX509SigningHelper> awsX509SigningHelperMockedStatic;
     private static MockedStatic<IoUtils> ioUtilsMockedStatic;
@@ -68,7 +68,7 @@ class CoreNegativeTests {
         awsX509SigningHelperMockedStatic = null;
         awsX509SigningHelperMockedStatic = mockStatic(AwsX509SigningHelper.class, CALLS_REAL_METHODS);
         awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.resolveUri(any()))
-                .thenReturn("http://localhost:8090" + SESSIONS_URI + "-empty-response");
+                .thenReturn("http://localhost:28090" + SESSIONS_URI + "-empty-response");
 
         var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
         var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
@@ -91,7 +91,44 @@ class CoreNegativeTests {
 
         assertThrows(IamException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
+                    .prefetch(properties.getPrefetch())
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+        awsX509SigningHelperMockedStatic.verify(() -> AwsX509SigningHelper.resolveUri(any()), atLeastOnce());
+    }
+
+    @Test
+    void successButEmptyResponseErrorTest() throws Exception {
+        awsX509SigningHelperMockedStatic.close();
+        awsX509SigningHelperMockedStatic = null;
+        awsX509SigningHelperMockedStatic = mockStatic(AwsX509SigningHelper.class, CALLS_REAL_METHODS);
+        awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.resolveUri(any()))
+                .thenReturn("http://localhost:28090" + SESSIONS_URI + "-success-empty-response");
+
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
+
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
+        System.out.println("ecCertChain "+ecCertChain);
+        System.out.println("ecKeyBase64 "+ecKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(ecKeyBase64);
+        properties.setEncodedX509Certificate(ecCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        assertThrows(IamException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -125,7 +162,7 @@ class CoreNegativeTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -160,7 +197,7 @@ class CoreNegativeTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -195,7 +232,7 @@ class CoreNegativeTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -230,7 +267,7 @@ class CoreNegativeTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();

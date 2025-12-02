@@ -1,6 +1,5 @@
 package in.neuw.aws.rolesanywhere;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnyWhereRequesterDetails;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsRequest;
@@ -23,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CoreTests {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = new JsonMapper();
 
     private static MockedStatic<AwsX509SigningHelper> mockedStatic;
 
@@ -50,11 +50,11 @@ class CoreTests {
         mockedStatic = mockStatic(AwsX509SigningHelper.class, CALLS_REAL_METHODS);
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostBasedOnRegion(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "localhost:8090";
+                    return "localhost:28090";
                 });
     }
 
@@ -79,7 +79,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(ObjectMapper.class)
+                        Mockito.any(JsonMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -103,7 +103,7 @@ class CoreTests {
         properties.setAsyncCredentialUpdateEnabled(true);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
@@ -114,7 +114,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(ObjectMapper.class)
+                Mockito.any(JsonMapper.class)
         ), atLeastOnce());
     }
 
@@ -125,7 +125,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(ObjectMapper.class)
+                        Mockito.any(JsonMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -149,7 +149,7 @@ class CoreTests {
         properties.setAsyncCredentialUpdateEnabled(true);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
@@ -160,7 +160,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(ObjectMapper.class)
+                Mockito.any(JsonMapper.class)
         ), atLeastOnce());
     }
 
@@ -171,7 +171,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(ObjectMapper.class)
+                        Mockito.any(JsonMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -194,7 +194,7 @@ class CoreTests {
         properties.setAsyncCredentialUpdateEnabled(true);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
@@ -205,7 +205,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(ObjectMapper.class)
+                Mockito.any(JsonMapper.class)
         ), atLeastOnce());
     }
 
@@ -216,7 +216,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(ObjectMapper.class)
+                        Mockito.any(JsonMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -239,7 +239,7 @@ class CoreTests {
         properties.setAsyncCredentialUpdateEnabled(true);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
@@ -250,7 +250,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(ObjectMapper.class)
+                Mockito.any(JsonMapper.class)
         ), atLeastOnce());
     }
 
@@ -261,7 +261,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(ObjectMapper.class)
+                        Mockito.any(JsonMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -285,7 +285,7 @@ class CoreTests {
         properties.setAsyncCredentialUpdateEnabled(false);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
@@ -296,7 +296,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(ObjectMapper.class)
+                Mockito.any(JsonMapper.class)
         ), atLeastOnce());
     }
 
@@ -328,7 +328,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(ObjectMapper.class)
+                        Mockito.any(JsonMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -354,7 +354,7 @@ class CoreTests {
 
         assertThrows(RuntimeException.class, () -> {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(properties, objectMapper)
+                    .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
@@ -367,7 +367,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(ObjectMapper.class)
+                        Mockito.any(JsonMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -391,7 +391,7 @@ class CoreTests {
         properties.setAsyncCredentialUpdateEnabled(false);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .durationSeconds(3600)
@@ -419,7 +419,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(ObjectMapper.class)
+                        Mockito.any(JsonMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -443,7 +443,7 @@ class CoreTests {
         properties.setAsyncCredentialUpdateEnabled(false);
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .durationSeconds(3600)
@@ -512,11 +512,11 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
@@ -547,11 +547,11 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         var provider = new IAMRolesAnywhereSessionsCredentialsProvider
-                .Builder(properties, objectMapper)
+                .Builder(properties, jsonMapper)
                 .prefetch(properties.getPrefetch())
                 .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                 .build();
@@ -582,12 +582,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .roleArn("test-something")
                     .profileArn("test-something")
                     .encodedPrivateKey(rsaKeyBase64)
@@ -628,12 +628,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .durationSeconds(0)
                     .roleArn("test-something")
                     .profileArn("test-something")
@@ -675,12 +675,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .durationSeconds(3600*14 + 1)
                     .roleArn("test-something")
                     .profileArn("test-something")
@@ -722,12 +722,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .durationSeconds(3600)
                     .profileArn("test-something")
                     .encodedPrivateKey(rsaKeyBase64)
@@ -768,12 +768,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .durationSeconds(3600)
                     .roleArn("test-something")
                     .profileArn("test-something")
@@ -814,12 +814,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .durationSeconds(3600)
                     .roleArn("test-something")
                     .encodedPrivateKey(rsaKeyBase64)
@@ -860,12 +860,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .durationSeconds(3600)
                     .roleArn("test-something")
                     .profileArn("test-something")
@@ -906,12 +906,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .durationSeconds(3600)
                     .roleArn("test-something")
                     .profileArn("test-something")
@@ -952,12 +952,12 @@ class CoreTests {
 
         mockedStatic.when(() -> AwsX509SigningHelper.resolveHostEndpoint(any(Region.class)))
                 .thenAnswer(invocation -> {
-                    return "http://localhost:8090";
+                    return "http://localhost:28090";
                 });
 
         try {
             new IAMRolesAnywhereSessionsCredentialsProvider
-                    .Builder(objectMapper)
+                    .Builder(jsonMapper)
                     .durationSeconds(3600)
                     .roleArn("test-something")
                     .profileArn("test-something")
