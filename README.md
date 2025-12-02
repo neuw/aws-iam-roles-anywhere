@@ -176,6 +176,7 @@ Run tests with: `mvn clean verify`
 
 | Version | AWS SDK v2 | Spring Boot | Notes                                                                                                                                        |
 |---------|------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| 1.0.0   | 2.39.6     | 4.0.0       | Support for JDK 8 for core and Starter is JDK 17, along with JACKSON 3 support                                                               |
 | 0.5.8   | 2.39.2     | 4.0.0       | This one has breaking changes from AWS's SDK, because constants inherited from them - they have been changed(relocated), spring boot - 4.0.0 |
 | 0.5.8.1 | 2.39.2     | 3.5.8       | This one has breaking changes from AWS's SDK, because constants inherited from them - they have been changed(relocated), spring boot - 3.5.8 |
 | 0.5.7   | 2.36.1     | 3.5.7       | Latest stable release                                                                                                                        |
