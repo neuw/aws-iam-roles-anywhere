@@ -272,9 +272,9 @@ public class AwsX509SigningHelper {
             responseBody = Optional.of(IoUtils.toUtf8String(requestSpec.responseBody().get()));
         }
         if (requestSpec.httpResponse().statusCode() == 201
-                && responseBody.isPresent()) {
+                && responseBody.isPresent() && StringUtils.isNotBlank(responseBody.get())) {
             // enable complete response log via debug only
-            log.debug("Successful Response from AWS roles anywhere sessions endpoint: {}", responseBody);
+            log.debug("Successful Response from AWS roles anywhere sessions endpoint: {}", responseBody.get());
             return jm.readValue(responseBody.get(), AwsRolesAnywhereSessionsResponse.class);
         } else {
             log.debug("Failed! Error Response from AWS roles anywhere sessions endpoint is: {}", responseBody);
