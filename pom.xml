@@ -43,7 +43,7 @@
         <spring-boot.version>3.5.0</spring-boot.version>
         <java.version>17</java.version>
         <parent.version>${project.version}</parent.version>
-        <jackson-bom.version>2.20.1</jackson-bom.version>
+        <jackson-bom.version>2.19.0</jackson-bom.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <jacoco.version>0.8.10</jacoco.version>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
