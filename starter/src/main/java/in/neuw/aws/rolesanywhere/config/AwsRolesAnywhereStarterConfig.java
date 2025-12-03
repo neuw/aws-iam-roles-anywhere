@@ -6,17 +6,17 @@ import in.neuw.aws.rolesanywhere.credentials.RolesAnywhereCredentialsProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @AutoConfiguration
 @EnableConfigurationProperties({AwsRolesAnywhereStarterProperties.class})
 public class AwsRolesAnywhereStarterConfig {
 
     private final AwsRolesAnywhereStarterProperties awsRolesAnywhereStarterProperties;
-    private final JsonMapper jsonMapper;
+    private final ObjectMapper jsonMapper;
 
     public AwsRolesAnywhereStarterConfig(final AwsRolesAnywhereStarterProperties awsRolesAnywhereStarterProperties,
-                                         final JsonMapper jsonMapper) {
+                                         final ObjectMapper jsonMapper) {
         this.awsRolesAnywhereStarterProperties = awsRolesAnywhereStarterProperties;
         this.jsonMapper = jsonMapper;
     }

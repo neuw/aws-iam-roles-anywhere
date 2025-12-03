@@ -1,5 +1,6 @@
 package in.neuw.aws.rolesanywhere;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnyWhereRequesterDetails;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsRequest;
@@ -22,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CoreTests {
 
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final ObjectMapper jsonMapper = new ObjectMapper();
 
     private static MockedStatic<AwsX509SigningHelper> mockedStatic;
 
@@ -79,7 +79,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(JsonMapper.class)
+                        Mockito.any(ObjectMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -114,7 +114,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(JsonMapper.class)
+                Mockito.any(ObjectMapper.class)
         ), atLeastOnce());
     }
 
@@ -125,7 +125,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(JsonMapper.class)
+                        Mockito.any(ObjectMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -160,7 +160,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(JsonMapper.class)
+                Mockito.any(ObjectMapper.class)
         ), atLeastOnce());
     }
 
@@ -171,7 +171,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(JsonMapper.class)
+                        Mockito.any(ObjectMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -205,7 +205,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(JsonMapper.class)
+                Mockito.any(ObjectMapper.class)
         ), atLeastOnce());
     }
 
@@ -216,7 +216,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(JsonMapper.class)
+                        Mockito.any(ObjectMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -250,7 +250,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(JsonMapper.class)
+                Mockito.any(ObjectMapper.class)
         ), atLeastOnce());
     }
 
@@ -261,7 +261,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(JsonMapper.class)
+                        Mockito.any(ObjectMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -296,7 +296,7 @@ class CoreTests {
                 Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                 Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                 Mockito.any(SdkHttpClient.class),
-                Mockito.any(JsonMapper.class)
+                Mockito.any(ObjectMapper.class)
         ), atLeastOnce());
     }
 
@@ -328,7 +328,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(JsonMapper.class)
+                        Mockito.any(ObjectMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -367,7 +367,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(JsonMapper.class)
+                        Mockito.any(ObjectMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 
@@ -419,7 +419,7 @@ class CoreTests {
                         Mockito.any(AwsRolesAnywhereSessionsRequest.class),
                         Mockito.any(AwsRolesAnyWhereRequesterDetails.class),
                         Mockito.any(SdkHttpClient.class),
-                        Mockito.any(JsonMapper.class)
+                        Mockito.any(ObjectMapper.class)
                 )
         ).thenAnswer(invocation -> mockAwsRolesAnywhereSessionsResponse());
 

@@ -12,7 +12,7 @@ import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.utils.StringUtils;
 import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.security.PrivateKey;
 import java.time.Instant;
@@ -77,7 +77,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
     private AwsRolesAnywhereSessionsResponse fetchCredentials(final AwsRolesAnywhereSessionsRequest awsRolesAnywhereSessionsRequest,
                                                               final AwsRolesAnyWhereRequesterDetails requesterDetails,
                                                               final SdkHttpClient sdkHttpClient,
-                                                              final JsonMapper jsonMapper) {
+                                                              final ObjectMapper jsonMapper) {
         return AwsX509SigningHelper.getIamRolesAnywhereSessions(awsRolesAnywhereSessionsRequest, requesterDetails, sdkHttpClient, jsonMapper);
     }
 
@@ -114,12 +114,12 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
 
         public Builder(final IAMRolesAnywhereSessionsCredentialsProvider provider) {
             super(IAMRolesAnywhereSessionsCredentialsProvider::new, provider);
-            super.jsonMapper(new JsonMapper());
+            super.jsonMapper(new ObjectMapper());
         }
 
         @SneakyThrows
         public Builder(final AwsRolesAnywhereProperties awsRolesAnywhereProperties,
-                       final JsonMapper jsonMapper) {
+                       final ObjectMapper jsonMapper) {
             super(IAMRolesAnywhereSessionsCredentialsProvider::new);
             this.awsRegion = Region.of(awsRolesAnywhereProperties.getRegion());
             // the awsRegion has to be initialized first for the Rest Client
@@ -140,7 +140,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
         }
 
         @SneakyThrows
-        public Builder(final JsonMapper jsonMapper) {
+        public Builder(final ObjectMapper jsonMapper) {
             super(IAMRolesAnywhereSessionsCredentialsProvider::new);
             this.initRestClient();
             this.jsonMapper(jsonMapper);

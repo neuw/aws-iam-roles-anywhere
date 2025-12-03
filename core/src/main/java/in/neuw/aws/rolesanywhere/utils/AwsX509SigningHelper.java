@@ -15,7 +15,7 @@ import software.amazon.awssdk.services.iam.model.IamException;
 import software.amazon.awssdk.utils.BinaryUtils;
 import software.amazon.awssdk.utils.IoUtils;
 import software.amazon.awssdk.utils.StringUtils;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class AwsX509SigningHelper {
 
     private AwsX509SigningHelper() {}
 
-    private static final JsonMapper OBJECT_MAPPER = new JsonMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC);
     private static final String LINE_SEPARATOR = "\n";
     private static final String SEMI_COLON = ";";
@@ -228,7 +228,7 @@ public class AwsX509SigningHelper {
             final AwsRolesAnywhereSessionsRequest sessionsRequest,
             final AwsRolesAnyWhereRequesterDetails requesterDetails,
             final SdkHttpClient sdkHttpClient,
-            final JsonMapper jm) {
+            final ObjectMapper jm) {
 
         try {
             String request = jm.writeValueAsString(sessionsRequest);
@@ -265,7 +265,7 @@ public class AwsX509SigningHelper {
         }
     }
 
-    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(JsonMapper jm, HttpExecuteResponse requestSpec) throws IOException {
+    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(ObjectMapper jm, HttpExecuteResponse requestSpec) throws IOException {
         log.info("AWS Roles anywhere sessions endpoint response status: {}", requestSpec.httpResponse().statusCode());
         Optional<String> responseBody = Optional.empty();
         if (requestSpec.responseBody().isPresent()) {

@@ -54,7 +54,7 @@ Add the appropriate dependency to your `pom.xml`:
 #### Using the Core Library
 
 ```java
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.IAMRolesAnywhereSessionsCredentialsProvider;
 import in.neuw.aws.rolesanywhere.props.AwsRolesAnywhereProperties;
 import software.amazon.awssdk.services.s3.S3Client;

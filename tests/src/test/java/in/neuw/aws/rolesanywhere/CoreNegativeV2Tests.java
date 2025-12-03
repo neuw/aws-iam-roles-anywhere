@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.core.exception.SdkException;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchProviderException;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mockStatic;
 @ExtendWith(MockitoExtension.class)
 class CoreNegativeV2Tests {
 
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final ObjectMapper jsonMapper = new ObjectMapper();
 
     private static MockedStatic<CertificateFactory> certificateFactoryMockedStatic;
 

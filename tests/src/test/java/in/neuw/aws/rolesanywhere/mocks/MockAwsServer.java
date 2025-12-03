@@ -1,5 +1,7 @@
 package in.neuw.aws.rolesanywhere.mocks;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformerV2;
@@ -8,7 +10,6 @@ import com.github.tomakehurst.wiremock.http.HttpHeaders;
 import com.github.tomakehurst.wiremock.http.Response;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import lombok.extern.slf4j.Slf4j;
-import tools.jackson.databind.json.JsonMapper;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static in.neuw.aws.rolesanywhere.utils.AwsX509SigningHelper.SESSIONS_URI;
@@ -17,7 +18,7 @@ import static in.neuw.aws.rolesanywhere.utils.MockAwsRolesAnywhereSessionsRespon
 @Slf4j
 public class MockAwsServer {
 
-    private static final JsonMapper jsonMapper = new JsonMapper();
+    private static final ObjectMapper jsonMapper = new ObjectMapper();
     private static WireMockServer instance;
 
     public static void stopInstance() {
@@ -86,9 +87,13 @@ public class MockAwsServer {
         public Response transform(Response response, ServeEvent serveEvent) {
             System.out.println("request body received = "+serveEvent.getRequest().getBodyAsString());
             var data = mockAwsRolesAnywhereSessionsResponse();
-            return Response.Builder.like(response)
-                    .body(jsonMapper.writeValueAsString(data))
-                    .build();
+            try {
+                return Response.Builder.like(response)
+                        .body(jsonMapper.writeValueAsString(data))
+                        .build();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
@@ -107,9 +112,13 @@ public class MockAwsServer {
         public Response transform(Response response, ServeEvent serveEvent) {
             System.out.println("request body received = "+serveEvent.getRequest().getBodyAsString());
             var data = mockAwsRolesAnywhereSessionsResponse();
-            return Response.Builder.like(response)
-                    .body(jsonMapper.writeValueAsString(data))
-                    .build();
+            try {
+                return Response.Builder.like(response)
+                        .body(jsonMapper.writeValueAsString(data))
+                        .build();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override

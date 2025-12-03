@@ -16,7 +16,7 @@ import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
 import software.amazon.awssdk.utils.cache.CachedSupplier;
 import software.amazon.awssdk.utils.cache.NonBlocking;
 import software.amazon.awssdk.utils.cache.RefreshResult;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -35,7 +35,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
      * The RestClient that should be used for periodically updating the session credentials.
      */
     final SdkHttpClient sdkHttpClient;
-    final JsonMapper jsonMapper;
+    final ObjectMapper jsonMapper;
 
     /**
      * The session cache that handles automatically updating the credentials when they get close to expiring.
@@ -141,7 +141,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
 
         private boolean asyncCredentialUpdateEnabled;
         private SdkHttpClient sdkHttpClient;
-        private JsonMapper jsonMapper;
+        private ObjectMapper jsonMapper;
         private Duration staleTime;
         private Duration prefetchTime = Duration.ofMinutes(5);
         // disabled by default
@@ -166,7 +166,7 @@ public abstract class RolesAnywhereCredentialsProvider implements AwsCredentials
             return (B) this;
         }
 
-        public B jsonMapper(JsonMapper jsonMapper) {
+        public B jsonMapper(ObjectMapper jsonMapper) {
             this.jsonMapper = jsonMapper;
             return (B) this;
         }
