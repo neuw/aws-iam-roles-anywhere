@@ -182,10 +182,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <autoPublish>false</autoPublish>
-                    <deploymentName>deploy-${build.date}-${version}-${aws-sdk.version}-${spring-boot.version}-1
-                    </deploymentName>
+                    <deploymentName>deploy-${build.date}-${version}-${aws-sdk.version}-${spring-boot.version}-1</deploymentName>
                     <publishingServerId>central</publishingServerId>
-                    <skipPublishing>true</skipPublishing>
+                    <skipPublishing>false</skipPublishing>
                     <waitUntil>validated</waitUntil>
                 </configuration>
             </plugin>
