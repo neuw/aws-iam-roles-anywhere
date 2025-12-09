@@ -4,7 +4,7 @@
 
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere</artifactId>
-    <version>0.7.1</version>
+    <version>0.7.2</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -181,11 +181,11 @@
                 <version>0.9.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <autoPublish>true</autoPublish>
+                    <autoPublish>false</autoPublish>
                     <deploymentName>deploy-${build.date}-${version}-${aws-sdk.version}-${spring-boot.version}-1
                     </deploymentName>
                     <publishingServerId>central</publishingServerId>
-                    <skipPublishing>false</skipPublishing>
+                    <skipPublishing>true</skipPublishing>
                     <waitUntil>validated</waitUntil>
                 </configuration>
             </plugin>
