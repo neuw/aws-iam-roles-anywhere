@@ -39,11 +39,11 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <aws-sdk.version>2.39.6</aws-sdk.version>
-    <spring-boot.version>4.0.0</spring-boot.version>
+    <aws-sdk.version>2.40.12</aws-sdk.version>
+    <spring-boot.version>4.0.1</spring-boot.version>
     <java.version>17</java.version>
     <parent.version>${project.version}</parent.version>
-    <jackson-bom.version>3.0.2</jackson-bom.version>
+    <jackson-bom.version>3.0.3</jackson-bom.version>
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
     <jacoco.version>0.8.10</jacoco.version>
     <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
