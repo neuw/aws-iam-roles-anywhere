@@ -253,7 +253,7 @@ public class IAMRolesAnywhereSessionsCredentialsProvider
                 throw new IllegalArgumentException("encodedPrivateKey cannot be blank");
             }
             if (StringUtils.isBlank(this.encodedX509Certificate)) {
-                throw new IllegalArgumentException("encodedPrivateKey cannot be blank");
+                throw new IllegalArgumentException("encodedX509Certificate cannot be blank");
             }
         }
     }
