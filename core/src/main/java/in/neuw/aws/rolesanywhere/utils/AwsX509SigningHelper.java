@@ -1,6 +1,6 @@
 package in.neuw.aws.rolesanywhere.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnyWhereRequesterDetails;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsRequest;
 import in.neuw.aws.rolesanywhere.credentials.models.AwsRolesAnywhereSessionsResponse;
@@ -8,7 +8,6 @@ import in.neuw.aws.rolesanywhere.credentials.models.X509CertificateChain;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
-import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.http.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.ServiceEndpointKey;
@@ -17,7 +16,6 @@ import software.amazon.awssdk.services.iam.model.IamException;
 import software.amazon.awssdk.utils.BinaryUtils;
 import software.amazon.awssdk.utils.IoUtils;
 import software.amazon.awssdk.utils.StringUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
