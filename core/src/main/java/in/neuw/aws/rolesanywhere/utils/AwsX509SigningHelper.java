@@ -289,7 +289,6 @@ public class AwsX509SigningHelper {
                         .build();
                 log.debug("Failed! Error Response from AWS roles anywhere sessions endpoint is: {}", responseBody);
                 log.debug("Error Details: {}", awsErrorDetails);
-                awsErrorDetails.errorMessage();
                 iamExceptionBuilder.awsErrorDetails(awsErrorDetails);
             }
             log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
