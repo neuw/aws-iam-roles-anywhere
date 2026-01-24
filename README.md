@@ -36,7 +36,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -45,7 +45,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
