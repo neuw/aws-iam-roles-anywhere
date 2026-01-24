@@ -25,7 +25,7 @@
     <scm>
         <connection>scm:git:git://github.com/neuw/aws-iam-roles-anywhere.git</connection>
         <developerConnection>scm:git:ssh://github.com:neuw/aws-iam-roles-anywhere.git</developerConnection>
-        <url>http://github.com/neuw/aws-iam-roles-anywhere/tree/master</url>
+        <url>https://github.com/neuw/aws-iam-roles-anywhere/tree/main</url>
     </scm>
 
     <developers>
