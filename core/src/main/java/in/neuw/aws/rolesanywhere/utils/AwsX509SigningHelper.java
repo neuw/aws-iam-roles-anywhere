@@ -7,7 +7,6 @@ import in.neuw.aws.rolesanywhere.credentials.models.X509CertificateChain;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
-import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.http.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.ServiceEndpointKey;
