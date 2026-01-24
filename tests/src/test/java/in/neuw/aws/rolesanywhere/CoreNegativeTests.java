@@ -100,6 +100,43 @@ class CoreNegativeTests {
     }
 
     @Test
+    void emptyResponseErrorTestV2() throws Exception {
+        awsX509SigningHelperMockedStatic.close();
+        awsX509SigningHelperMockedStatic = null;
+        awsX509SigningHelperMockedStatic = mockStatic(AwsX509SigningHelper.class, CALLS_REAL_METHODS);
+        awsX509SigningHelperMockedStatic.when(() -> AwsX509SigningHelper.resolveUri(any()))
+                .thenReturn("http://localhost:28090" + SESSIONS_URI + "-error-response");
+
+        var ecKeyPair = KeyPairGeneratorTestUtil.generateKeyPair("EC", "secp384r1");
+        var ecKeyBase64 = Base64.getEncoder().encodeToString(convertToOpenSSLFormat(ecKeyPair.getPrivate()).getBytes(StandardCharsets.UTF_8));
+        var ecCertChain = generateCertificateChainText("EC", ecKeyPair);
+
+        System.out.println(convertToPEM(ecKeyPair.getPrivate()));
+        System.out.println("ecCertChain "+ecCertChain);
+        System.out.println("ecKeyBase64 "+ecKeyBase64);
+
+        var properties = new AwsRolesAnywhereProperties();
+        properties.setEncodedPrivateKey(ecKeyBase64);
+        properties.setEncodedX509Certificate(ecCertChain);
+        properties.setRoleArn("test");
+        properties.setProfileArn("test");
+        properties.setTrustAnchorArn("test");
+        properties.setPrefetch(true);
+        properties.setRegion("ap-south-1");
+        properties.setDurationSeconds(3600);
+        properties.setAsyncCredentialUpdateEnabled(true);
+
+        assertThrows(IamException.class, () -> {
+            new IAMRolesAnywhereSessionsCredentialsProvider
+                    .Builder(properties, jsonMapper)
+                    .prefetch(properties.getPrefetch())
+                    .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
+                    .build();
+        });
+        awsX509SigningHelperMockedStatic.verify(() -> AwsX509SigningHelper.resolveUri(any()), atLeastOnce());
+    }
+
+    @Test
     void successButEmptyResponseErrorTest() throws Exception {
         awsX509SigningHelperMockedStatic.close();
         awsX509SigningHelperMockedStatic = null;
