@@ -106,9 +106,8 @@ public class MockAwsServer {
         @Override
         public Response transform(Response response, ServeEvent serveEvent) {
             System.out.println("request body received = "+serveEvent.getRequest().getBodyAsString());
-            var data = mockAwsRolesAnywhereSessionsResponse();
             return Response.Builder.like(response)
-                    .body(jsonMapper.writeValueAsString(data))
+                    .body("{\"message\":\"A message\"}")
                     .build();
         }
 

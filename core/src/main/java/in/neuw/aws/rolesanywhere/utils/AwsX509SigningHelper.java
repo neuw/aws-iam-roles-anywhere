@@ -7,6 +7,7 @@ import in.neuw.aws.rolesanywhere.credentials.models.X509CertificateChain;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
+import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.http.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.ServiceEndpointKey;
@@ -250,38 +251,49 @@ public class AwsX509SigningHelper {
             String signingAlgorithm = resolveAwsAlgorithm(requesterDetails.getPrivateKey());
             String contentToSign = contentToSign(instant, awsRegion, signingAlgorithm, canonicalRequest);
 
-            HttpExecuteResponse requestSpec = executeHttpRequest(instant, sessionsRequest, sdkHttpClient, requesterDetails, contentToSign, signingAlgorithm);
+            HttpExecuteResponse httpExecuteResponse = executeHttpRequest(instant, sessionsRequest, sdkHttpClient, requesterDetails, contentToSign, signingAlgorithm);
 
             // Print status code
-            log.debug("Status Code is {} for AWS roles anywhere session endpoint", requestSpec.httpResponse().statusCode());
+            log.debug("Status Code is {} for AWS roles anywhere session endpoint", httpExecuteResponse.httpResponse().statusCode());
 
             // Read and print response body
-            return getAwsRolesAnywhereSessionsResponse(jm, requestSpec);
+            return getAwsRolesAnywhereSessionsResponse(jm, httpExecuteResponse);
         } catch (NoSuchAlgorithmException | IOException | CertificateException | NoSuchProviderException |
-                 SignatureException | InvalidKeyException | IamException e) {
+                 SignatureException | InvalidKeyException e) {
             throw IamException.builder()
                     .message("Error while trying to connect to AWS ROLES ANYWHERE")
+                    .cause(e)
                     .build();
         }
     }
 
-    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(JsonMapper jm, HttpExecuteResponse requestSpec) throws IOException {
-        log.info("AWS Roles anywhere sessions endpoint response status: {}", requestSpec.httpResponse().statusCode());
+    private static AwsRolesAnywhereSessionsResponse getAwsRolesAnywhereSessionsResponse(JsonMapper jm,
+                                                                                        HttpExecuteResponse httpExecuteResponse) throws IOException {
+        log.info("AWS Roles anywhere sessions endpoint response status: {}", httpExecuteResponse.httpResponse().statusCode());
         Optional<String> responseBody = Optional.empty();
-        if (requestSpec.responseBody().isPresent()) {
-            responseBody = Optional.of(IoUtils.toUtf8String(requestSpec.responseBody().get()));
+        if (httpExecuteResponse.responseBody().isPresent()) {
+            responseBody = Optional.of(IoUtils.toUtf8String(httpExecuteResponse.responseBody().get()));
         }
-        if (requestSpec.httpResponse().statusCode() == 201
+        if (httpExecuteResponse.httpResponse().statusCode() == 201
                 && responseBody.isPresent() && StringUtils.isNotBlank(responseBody.get())) {
             // enable complete response log via debug only
             log.debug("Successful Response from AWS roles anywhere sessions endpoint: {}", responseBody.get());
             return jm.readValue(responseBody.get(), AwsRolesAnywhereSessionsResponse.class);
         } else {
-            log.debug("Failed! Error Response from AWS roles anywhere sessions endpoint is: {}", responseBody);
-            log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
-            throw IamException.builder()
+            IamException.Builder iamExceptionBuilder = IamException.builder()
                     .message("failed response for the AWS ROLES ANYWHERE SESSION endpoint")
-                    .build();
+                    .statusCode(httpExecuteResponse.httpResponse().statusCode());
+            if (httpExecuteResponse.responseBody().isPresent()) {
+                AwsErrorDetails awsErrorDetails = AwsErrorDetails.builder()
+                        .sdkHttpResponse(httpExecuteResponse.httpResponse())
+                        .build();
+                log.debug("Failed! Error Response from AWS roles anywhere sessions endpoint is: {}", responseBody);
+                log.debug("Error Details: {}", awsErrorDetails);
+                awsErrorDetails.errorMessage();
+                iamExceptionBuilder.awsErrorDetails(awsErrorDetails);
+            }
+            log.error("failed response for the AWS ROLES ANYWHERE SESSION endpoint");
+            throw iamExceptionBuilder.build();
         }
     }
 
