@@ -48,6 +48,7 @@
         <jacoco.version>0.8.10</jacoco.version>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
         <build.date>${maven.build.timestamp}</build.date>
+        <vendor.name>Neuw</vendor.name>
     </properties>
 
     <dependencyManagement>
