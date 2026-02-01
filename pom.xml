@@ -4,7 +4,7 @@
 
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere</artifactId>
-    <version>0.7.10</version>
+    <version>0.7.11-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
