@@ -154,6 +154,41 @@ For certificate generation and setup, refer to the [roles-anywhere-openssl repos
 
 Run tests with: `mvn clean verify`
 
+## Logging
+
+Without logging config the logs won't show up at all in the console.
+
+For logging configuration, when just using the core library, you may use the following logback.xml example for reference:
+
+```xml
+<configuration>
+    <!-- Keep Apache HTTP logs minimal -->
+    <logger name="org.apache.http" level="WARN"/>
+    <logger name="org.apache.http.wire" level="OFF"/>
+    <logger name="org.apache.http.headers" level="OFF"/>
+    <logger name="in.neuw.aws" level="DEBUG"/> <!-- or INFO, etc. -->
+
+    <!-- Ensure other logs appear -->
+    <root level="DEBUG"> <!-- or INFO, DEBUG, WARN, ERROR -->
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <!-- Console Appender (if missing) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+</configuration>
+```
+
+For logging configuration when using the starter, it is relatively straight forward, and spring boot will automatically help in there.
+
+```
+# example config for enabling debug logging for aws-iam-roles-anywhere-starter
+logger.in.neuw.aws=DEBUG
+```
+
 ## Troubleshooting
 
 ### Common Issues
