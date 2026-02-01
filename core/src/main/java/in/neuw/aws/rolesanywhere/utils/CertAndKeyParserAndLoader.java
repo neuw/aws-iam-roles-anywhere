@@ -457,7 +457,7 @@ public class CertAndKeyParserAndLoader {
         } catch (InvalidKeyException e) {
             log.error("this is not root CA, invalid key");
         } catch (SignatureException e) {
-            log.warn("the cert with name = {} is not Root CA signature issue", cert.getSubjectX500Principal().getName());
+            log.warn("the cert with name = {} can not be Root CA, since verification of signature failed", cert.getSubjectX500Principal().getName());
         } catch (CertificateException | NoSuchAlgorithmException | NoSuchProviderException e) {
             log.error("this is not Root CA, exception", e.getCause());
         }
