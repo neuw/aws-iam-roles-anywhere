@@ -93,6 +93,7 @@ class CoreNegativeTests {
             new IAMRolesAnywhereSessionsCredentialsProvider
                     .Builder(properties, jsonMapper)
                     .prefetch(properties.getPrefetch())
+                    .region(properties.getRegion())
                     .asyncCredentialUpdateEnabled(properties.getAsyncCredentialUpdateEnabled())
                     .build();
         });
