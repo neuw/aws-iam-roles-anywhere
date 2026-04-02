@@ -36,7 +36,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 </dependency>
 ```
 
@@ -45,7 +45,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 </dependency>
 ```
 
@@ -211,6 +211,7 @@ logger.in.neuw.aws=DEBUG
 
 | Version | Core's JDK<br/> Runtime | Starter's JDK<br/>Runtime | AWS SDK v2   | Spring Boot | Notes                                                                                                                                        |
 |---------|-------------------------|---------------------------|--------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| 1.0.5   | 17                      | 17                        | 2.42.25      | 4.0.5       | JDK 17 only, Spring Boot 4.0.5 & AWS SDK 2.42.25                                                                                             |
 | 1.0.4   | 17                      | 17                        | 2.42.16      | 4.0.4       | JDK 17 only, Spring Boot 4.0.4 & AWS SDK 2.42.16                                                                                             |
 | 1.0.3   | 17                      | 17                        | 2.41.33      | 4.0.3       | JDK 17 only, Spring Boot 4.0.3 & AWS SDK 2.41.33                                                                                             |
 | 1.0.2   | 17                      | 17                        | 2.41.14      | 4.0.2       | JDK 17 only, Spring Boot 4.0.2 & AWS SDK 2.41.14                                                                                             |
