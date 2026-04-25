@@ -36,7 +36,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-core</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 </dependency>
 ```
 
@@ -45,7 +45,7 @@ Add the appropriate dependency to your `pom.xml`:
 <dependency>
     <groupId>in.neuw</groupId>
     <artifactId>aws-iam-roles-anywhere-starter</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 </dependency>
 ```
 
@@ -211,6 +211,7 @@ logger.in.neuw.aws=DEBUG
 
 | Version | Core's JDK<br/> Runtime | Starter's JDK<br/>Runtime | AWS SDK v2   | Spring Boot | Notes                                                                                                                                        |
 |---------|-------------------------|---------------------------|--------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| 1.0.6   | 17                      | 17                        | 2.42.41      | 4.0.6       | JDK 17 only, Spring Boot 4.0.6 & AWS SDK 2.42.41                                                                                             |
 | 1.0.5   | 17                      | 17                        | 2.42.25      | 4.0.5       | JDK 17 only, Spring Boot 4.0.5 & AWS SDK 2.42.25                                                                                             |
 | 1.0.4   | 17                      | 17                        | 2.42.16      | 4.0.4       | JDK 17 only, Spring Boot 4.0.4 & AWS SDK 2.42.16                                                                                             |
 | 1.0.3   | 17                      | 17                        | 2.41.33      | 4.0.3       | JDK 17 only, Spring Boot 4.0.3 & AWS SDK 2.41.33                                                                                             |
@@ -231,21 +232,6 @@ logger.in.neuw.aws=DEBUG
 | 0.7.1   | 8                       | 17                        | 2.40.4       | 3.5.1       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
 | 0.7.0   | 8                       | 17                        | 2.40.4       | 3.5.0       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
 |         |                         |                           |              |             |                                                                                                                                              |
-| **DO**  | **NOT USE**             | **BELOW**                 | **VERSIONS** |             | **DO NOT USE BELOW VERSIONS - They are deprecated now, use 0.7.x or 1.x.x based on needs**                                                   |
-|         |                         |                           |              |             |                                                                                                                                              |
-| 0.5.8   | 17                      | 17                        | 2.39.2       | 4.0.0       | This one has breaking changes from AWS's SDK, because constants inherited from them - they have been changed(relocated), spring boot - 4.0.0 |
-| 0.5.8.1 | 17                      | 17                        | 2.39.2       | 3.5.8       | This one has breaking changes from AWS's SDK, because constants inherited from them - they have been changed(relocated), spring boot - 3.5.8 |
-| 0.5.7   | 17                      | 17                        | 2.36.1       | 3.5.7       | Latest stable release                                                                                                                        |
-| 0.5.6   | 17                      | 17                        | 2.34.0       | 3.5.6       | Latest stable release                                                                                                                        |
-| 0.5.5   | 17                      | 17                        | 2.32.27      | 3.5.5       | Better Exception Handling features                                                                                                           |
-| 0.5.4   | 17                      | 17                        | 2.32.7       | 3.5.4       | No major or minor changes                                                                                                                    |
-| 0.5.3   | 17                      | 17                        | 2.31.68      | 3.5.3       | No major or minor changes                                                                                                                    |
-| 0.5.2   | 17                      | 17                        | 2.31.66      | 3.5.2       | Bug fixes and dependency updates                                                                                                             |
-| 0.5.1   | 17                      | 17                        | 2.31.65      | 3.5.1       | Performance improvements                                                                                                                     |
-| 0.5     | 17                      | 17                        | 2.31.63      | 3.5.0       | **PKCS#8 support added**                                                                                                                     |
-| 0.4.5.1 | 17                      | 17                        | 2.31.50      | 3.5.0       | Property validation enhancements                                                                                                             |
-| 0.4.5   | 17                      | 17                        | 2.31.50      | 3.5.0       | Spring Boot 3.5.0 support                                                                                                                    |
-| 0.4.4   | 17                      | 17                        | 2.31.50      | 3.4.6       | Stability improvements                                                                                                                       |
 
 ### Encoding Certificate and Key Files
 
