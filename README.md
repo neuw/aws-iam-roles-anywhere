@@ -219,19 +219,8 @@ logger.in.neuw.aws=DEBUG
 | 1.0.1   | 17                      | 17                        | 2.40.12      | 4.0.1       | JDK 17 only, Spring Boot 4.0.1 & AWS SDK 2.40.12                                                                                             |
 | 1.0.0   | 17                      | 17                        | 2.39.6       | 4.0.0       | JDK 17 only, along with JACKSON 3 support                                                                                                    |
 |         |                         |                           |              |             |                                                                                                                                              |
-| 0.7.11  | 8                       | 17                        | 2.41.33      | 3.5.11      | newer version of dependent libraries supported. JDK 8 for core and Starter is JDK 17, with jackson 2                                         |
-| 0.7.10  | 8                       | 17                        | 2.41.14      | 3.5.10      | newer version of dependent libraries supported. JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8    |
-| 0.7.9   | 8                       | 17                        | 2.40.12      | 3.5.9       | newer version of dependent libraries supported. JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8    |
-| 0.7.8   | 8                       | 17                        | 2.40.4       | 3.5.8       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-| 0.7.7   | 8                       | 17                        | 2.40.4       | 3.5.7       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-| 0.7.6   | 8                       | 17                        | 2.40.4       | 3.5.6       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-| 0.7.5   | 8                       | 17                        | 2.40.4       | 3.5.5       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-| 0.7.4   | 8                       | 17                        | 2.40.4       | 3.5.4       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-| 0.7.3   | 8                       | 17                        | 2.40.4       | 3.5.3       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-| 0.7.2   | 8                       | 17                        | 2.40.4       | 3.5.2       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-| 0.7.1   | 8                       | 17                        | 2.40.4       | 3.5.1       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-| 0.7.0   | 8                       | 17                        | 2.40.4       | 3.5.0       | Support for JDK 8 for core and Starter is JDK 17, with jackson 2 - jackson 3 does not work with JDK 8                                        |
-|         |                         |                           |              |             |                                                                                                                                              |
+
+For older versions, refer to the [release notes](https://github.com/neuw/aws-iam-roles-anywhere/releases). For JDK 8 support, check out the 0.7.x branch.
 
 ### Encoding Certificate and Key Files
 
