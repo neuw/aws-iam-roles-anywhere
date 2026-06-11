@@ -209,16 +209,17 @@ logger.in.neuw.aws=DEBUG
 
 ## Version History
 
-| Version | Core's JDK<br/> Runtime | Starter's JDK<br/>Runtime | AWS SDK v2   | Spring Boot | Notes                                                                                                                                        |
-|---------|-------------------------|---------------------------|--------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| 1.0.6   | 17                      | 17                        | 2.42.41      | 4.0.6       | JDK 17 only, Spring Boot 4.0.6 & AWS SDK 2.42.41                                                                                             |
-| 1.0.5   | 17                      | 17                        | 2.42.25      | 4.0.5       | JDK 17 only, Spring Boot 4.0.5 & AWS SDK 2.42.25                                                                                             |
-| 1.0.4   | 17                      | 17                        | 2.42.16      | 4.0.4       | JDK 17 only, Spring Boot 4.0.4 & AWS SDK 2.42.16                                                                                             |
-| 1.0.3   | 17                      | 17                        | 2.41.33      | 4.0.3       | JDK 17 only, Spring Boot 4.0.3 & AWS SDK 2.41.33                                                                                             |
-| 1.0.2   | 17                      | 17                        | 2.41.14      | 4.0.2       | JDK 17 only, Spring Boot 4.0.2 & AWS SDK 2.41.14                                                                                             |
-| 1.0.1   | 17                      | 17                        | 2.40.12      | 4.0.1       | JDK 17 only, Spring Boot 4.0.1 & AWS SDK 2.40.12                                                                                             |
-| 1.0.0   | 17                      | 17                        | 2.39.6       | 4.0.0       | JDK 17 only, along with JACKSON 3 support                                                                                                    |
-|         |                         |                           |              |             |                                                                                                                                              |
+| Version | Core's JDK<br/> Runtime | Starter's JDK<br/>Runtime | AWS SDK v2 | Spring Boot | Notes                                            |
+|---------|-------------------------|---------------------------|------------|-------------|--------------------------------------------------|
+| 1.0.7   | 17                      | 17                        | 2.46.8     | 4.0.7       | JDK 17 only, Spring Boot 4.0.7 & AWS SDK 2.46.8  |
+| 1.0.6   | 17                      | 17                        | 2.42.41    | 4.0.6       | JDK 17 only, Spring Boot 4.0.6 & AWS SDK 2.42.41 |
+| 1.0.5   | 17                      | 17                        | 2.42.25    | 4.0.5       | JDK 17 only, Spring Boot 4.0.5 & AWS SDK 2.42.25 |
+| 1.0.4   | 17                      | 17                        | 2.42.16    | 4.0.4       | JDK 17 only, Spring Boot 4.0.4 & AWS SDK 2.42.16 |
+| 1.0.3   | 17                      | 17                        | 2.41.33    | 4.0.3       | JDK 17 only, Spring Boot 4.0.3 & AWS SDK 2.41.33 |
+| 1.0.2   | 17                      | 17                        | 2.41.14    | 4.0.2       | JDK 17 only, Spring Boot 4.0.2 & AWS SDK 2.41.14 |
+| 1.0.1   | 17                      | 17                        | 2.40.12    | 4.0.1       | JDK 17 only, Spring Boot 4.0.1 & AWS SDK 2.40.12 |
+| 1.0.0   | 17                      | 17                        | 2.39.6     | 4.0.0       | JDK 17 only, along with JACKSON 3 support        |
+|         |                         |                           |            |             |                                                  |
 
 For older versions, refer to the [release notes](https://github.com/neuw/aws-iam-roles-anywhere/releases). For JDK 8 support, check out the 0.7.x branch.
 
