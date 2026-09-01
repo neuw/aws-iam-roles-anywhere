@@ -211,6 +211,7 @@ logger.in.neuw.aws=DEBUG
 
 | Version | Core's JDK<br/> Runtime | Starter's JDK<br/>Runtime | AWS SDK v2 | Spring Boot | Notes                                            |
 |---------|-------------------------|---------------------------|------------|-------------|--------------------------------------------------|
+| 1.0.8   | 17                      | 17                        | 2.54.9     | 4.0.8       | JDK 17 only, Spring Boot 4.0.8 & AWS SDK 2.54.9  |
 | 1.0.7   | 17                      | 17                        | 2.46.8     | 4.0.7       | JDK 17 only, Spring Boot 4.0.7 & AWS SDK 2.46.8  |
 | 1.0.6   | 17                      | 17                        | 2.42.41    | 4.0.6       | JDK 17 only, Spring Boot 4.0.6 & AWS SDK 2.42.41 |
 | 1.0.5   | 17                      | 17                        | 2.42.25    | 4.0.5       | JDK 17 only, Spring Boot 4.0.5 & AWS SDK 2.42.25 |
